@@ -2,6 +2,7 @@
 #include "headers\karczma.h"
 #include "headers\browar.h"
 #include "headers\edge.h"
+#include "headers/field.h"
 
 
 int main(){
