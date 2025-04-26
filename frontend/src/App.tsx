@@ -14,7 +14,7 @@ function App() {
   return (
       <>
           <h1>Projek Algorytmy i Struktury danych</h1>
-          <h2> Uniwerstytert Mikołaja Kopernika w Trtouniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema Szyński</h2>
+          <h2> Uniwersytet Mikołaja Kopernika w Toruniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema Szyński</h2>
           <div>
               <a href="https://vite.dev" target="_blank">
                   <img src={viteLogo} className="logo" alt="Vite logo"/>

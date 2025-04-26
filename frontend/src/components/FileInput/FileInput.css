@@ -1,0 +1,26 @@
+.dropzone {
+    border: 2px dashed #213547;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 24rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    margin: 20px auto;
+    background-color: #fefefe;
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.dropzone-text {
+    color: #213547;
+    font-size: 1.125rem;
+    pointer-events: none;
+}
