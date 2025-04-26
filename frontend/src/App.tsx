@@ -5,6 +5,7 @@ import './App.css'
 import {useState} from "react";
 import {FileInput} from "./components/FileInput/FileInput.tsx";
 import {Fetch} from "./utils/Fetch.tsx";
+import {Map} from "./components/Map/Map.tsx";
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
           <button onClick={async () => setMessageSecond(await Fetch(`/api/add-json`, "POST", { a:4,b:5 }) as string)}>POST API TEST</button>
           <p>{messageSecond}</p>
           <FileInput/>
+          <Map/>
       </>
   )
 }

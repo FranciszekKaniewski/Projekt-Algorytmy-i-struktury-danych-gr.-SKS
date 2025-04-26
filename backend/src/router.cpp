@@ -67,8 +67,8 @@ void Router::setupRoutes() {
                         for (const auto& v : this->allVertices) {
                             crow::json::wvalue vertex;
                             vertex["id"] = v.id;
-                            vertex["x"] = v.location.x;
-                            vertex["y"] = v.location.y;
+                            vertex["position"]["x"] = v.location.x;
+                            vertex["position"]["y"] = v.location.y;
                             vertices_json[i++] = std::move(vertex);
                         }
 
