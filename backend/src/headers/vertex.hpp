@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 
 using namespace std;
@@ -9,10 +10,10 @@ struct Location{
 
 class Vertex{
 private:
-    int id;
     static int counter;
     
-public:   
+public:
+    int id;
     Vertex(double x, double y);
     Location location;
 
