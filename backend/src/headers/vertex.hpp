@@ -11,9 +11,10 @@ class Vertex{
 private:
     int id;
     static int counter;
-    Location location;
+    
 public:   
     Vertex(double x, double y);
+    Location location;
 
     void print();
 };
