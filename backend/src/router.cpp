@@ -1,4 +1,5 @@
-#include "headers/router.hpp"
+#include "./headers/router.hpp"
+#include "./headers/vertex.hpp"
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::string path) : app_(app), path(path) {
     setupRoutes();
@@ -41,4 +42,6 @@ void Router::setupRoutes() {
                         os << "Tworze " << body["type"] << " id: " << body["id"] << " na pozycji x: " << body["position"]["x"] << "y: " << body["position"]["y"] << " !\n";
                         return crow::response(os.str());
                     });
+
+    
 }
