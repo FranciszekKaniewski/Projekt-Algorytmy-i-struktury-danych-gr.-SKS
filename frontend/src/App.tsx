@@ -10,8 +10,6 @@ function App() {
 
     const [message, setMessage] = useState("")
     const [messageSecond, setMessageSecond] = useState("")
-    const [name, setName] = useState("")
-    const [age, setAge] = useState(0)
 
   return (
       <>

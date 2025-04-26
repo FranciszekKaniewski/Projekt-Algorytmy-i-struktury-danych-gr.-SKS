@@ -1,12 +1,14 @@
 import {useState} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Vertex ,jsonDataFromFile} from "../../interfaces/interfaces.ts";
+import {Vertex} from "../../interfaces/interfaces.ts";
 
-export const FileInput = (props) => {
+export const FileInput = () => {
     const [jsonData, setJsonData] = useState<Vertex[] | null>(null);
+    const [message, setMessage] = useState("");
 
     const sendHandler = async () => {
-        await Fetch("/api/file","POST",(jsonData as Vertex[])[0]);
+        const res = await Fetch("/api/file","POST",(jsonData as Vertex[])[0]);
+        setMessage(res as string);
     }
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,9 +31,10 @@ export const FileInput = (props) => {
         <div className="p-4">
             <input type="file" accept=".txt" onChange={(e)=>handleFileChange(e)} />
             <br/>
-            <button onClick={()=>sendHandler()}  className="mt-4 p-2 bg-blue-500 text-white rounded">
+            <button onClick={()=> sendHandler()}  className="mt-4 p-2 bg-blue-500 text-white rounded">
                 Wyślij na backend
             </button>
+            <p>{message}</p>
         </div>
     )
 }
