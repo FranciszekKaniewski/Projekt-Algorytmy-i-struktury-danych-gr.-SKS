@@ -21,7 +21,7 @@ void Server::routerHandler() {
                 return "Hello world!";
             });
 
-    this->router = std::make_unique<Router>(this->app,this->allVertices,"/api");
+    this->router = std::make_unique<Router>(this->app,this->allVertices,this->allEdges,"/api");
 }
 
 Server::Server() {

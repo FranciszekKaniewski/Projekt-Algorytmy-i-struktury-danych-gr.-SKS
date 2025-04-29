@@ -14,6 +14,15 @@ void Vertex::print(){
     cout << location.x << " " << location.y << " " << this->id <<  endl;
 }
 
+Vertex* Vertex::findOnePtrById(vector<Vertex *> &arr, int id) {
+    for (auto* v : arr) {
+        if (v->id == id) {
+            return v;
+        }
+    }
+    return nullptr;
+}
+
 Field::Field(double x, double y, float production) : Vertex(x,y), production(production) {};
 
 Brewery::Brewery(double x, double y) : Vertex(x,y) {};

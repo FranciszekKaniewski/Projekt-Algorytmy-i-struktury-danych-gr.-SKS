@@ -20,6 +20,7 @@ public:
     Location location;
 
     void print();
+    static Vertex* findOnePtrById(vector<Vertex*>& arr, int id);
 };
 
 class Field : public Vertex{

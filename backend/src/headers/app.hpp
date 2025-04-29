@@ -6,6 +6,7 @@
 #include <memory>
 #include "string"
 #include "vertex.hpp"
+#include "Edge.hpp"
 
 class Router;
 
@@ -14,6 +15,7 @@ public:
     crow::App<crow::CORSHandler> app;
     std::unique_ptr<Router> router;
     std::vector<Vertex*> allVertices;
+    std::vector<Edge*> allEdges;
 
     Server();
     ~Server();

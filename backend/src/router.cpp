@@ -1,8 +1,8 @@
 #include "./headers/router.hpp"
 #include "./headers/vertex.hpp"
 
-Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::string path)
-        : app_(app), allVertices(allVertices), path(path) {
+Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
+        : app_(app), allVertices(allVertices), allEdges(allEdges), path(path) {
     setupRoutes();
 }
 
@@ -111,5 +111,56 @@ void Router::setupRoutes() {
                         return crow::response(vertices_json);
                     });
 
-    
+    //Add many Edges
+    this->app_.route_dynamic(this->path+"/edges")
+            .methods(crow::HTTPMethod::Post)
+                    ([this](const crow::request& req) {
+                        auto body = crow::json::load(req.body);
+                        if (!body)
+                            return crow::response(400, "Invalid JSON");
+
+                        int i=0;
+                        for (const auto& item : body) {
+                            if (!item.has("fromId") || !item.has("toId")) {
+                                return crow::response(400, "Invalid item in list");
+                            }
+
+                            Vertex* v1 = Vertex::findOnePtrById(allVertices,item["fromId"].i());
+                            Vertex* v2 = Vertex::findOnePtrById(allVertices,item["toId"].i());
+                            if (!v1 || !v2) {
+                                return crow::response(400, "Invalid vertex id");
+                            }
+
+                            this->allEdges.push_back(new Edge(v1, v2));
+                            i++;
+                        }
+
+                        std::ostringstream os;
+                        os << i << " Edges Added!";
+                        return crow::response(os.str());
+                    });
+
+    //Get many Edges
+    this->app_.route_dynamic(this->path+"/edges")
+            .methods(crow::HTTPMethod::Get)
+                    ([this]() {
+                        crow::json::wvalue vertices_json;
+                        vertices_json = crow::json::wvalue::list();
+
+                        int i = 0;
+                        for (auto& e : this->allEdges) {
+
+                            crow::json::wvalue edge;
+                            edge["id"] = e->id;
+                            edge["fromId"] = e->start->id;
+                            edge["toId"] = e->end->id;
+
+                            vertices_json[i++] = std::move(edge);
+                        }
+
+                        return crow::response(vertices_json);
+                    });
+
+
+
 }
