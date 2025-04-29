@@ -11,9 +11,9 @@ int main()
     Cross c1(4.4, 5.5, 8.0);
     Inn i1(5.0, 4.0);
     
-    // Edge e1(f1, b1);
-    // Edge e2(b1, c1);
-    // Edge e3(c1, i1);
+     Edge e1(&f1, &b1);
+     Edge e2(&b1, &c1);
+     Edge e3(&c1, &i1);
     
     cout << "Brewery 1 id" << b1.id << endl;
     cout << "Cross 1 id" << c1.id << endl;

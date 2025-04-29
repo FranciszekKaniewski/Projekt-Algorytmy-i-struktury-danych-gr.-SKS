@@ -5,12 +5,11 @@
 
 using namespace std;
 
-
 class Edge{
     public:
-        Edge(Vertex start, Vertex end, bool isBroken);    
-        Vertex start;
-        Vertex end;
+        Edge(Vertex* start, Vertex* end, bool isBroken = false);
+        Vertex* start;
+        Vertex* end;
         
         bool isBroken;
         double length;
