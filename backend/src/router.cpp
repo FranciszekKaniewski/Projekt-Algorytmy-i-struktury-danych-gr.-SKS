@@ -161,6 +161,27 @@ void Router::setupRoutes() {
                         return crow::response(vertices_json);
                     });
 
+    //Clear all V and E
+    this->app_.route_dynamic(this->path+"/clear")
+            .methods(crow::HTTPMethod::Post)
+                    ([this]() {
+                        int i=0;
+                        i += allEdges.size() + allVertices.size();
+                        for (Edge* ptr : allEdges) {
+                            delete ptr;
+                        }
+                        allEdges.clear();
 
+                        for (Vertex* ptr : allVertices) {
+                            delete ptr;
+                        }
+                        allVertices.clear();
 
+                        Edge::freeId = 0;
+                        Vertex::counter = 0;
+
+                        std::ostringstream os;
+                        os << i << " Edges and Vertices Deleted!";
+                        return crow::response(os.str());
+                    });
 }

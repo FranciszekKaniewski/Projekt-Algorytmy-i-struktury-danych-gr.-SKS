@@ -9,11 +9,9 @@ struct Location{
 };
 
 class Vertex{
-private:
-    static int counter;
-    
 public:
     int id;
+    static int counter;
     Vertex() {};
     Vertex(double x, double y);
     virtual ~Vertex() = default;
