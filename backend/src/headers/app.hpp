@@ -13,7 +13,7 @@ class Server {
 public:
     crow::App<crow::CORSHandler> app;
     std::unique_ptr<Router> router;
-    std::vector<Vertex> allVertices;
+    std::vector<Vertex*> allVertices;
 
     Server();
     ~Server();

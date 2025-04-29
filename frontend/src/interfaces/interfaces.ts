@@ -4,6 +4,13 @@ export interface Vertex {
     position: {x: number; y: number};
 }
 
+export interface Field extends Vertex{
+    production: number;
+}
+export interface Cross extends Vertex{
+    limit: number;
+}
+
 export interface jsonDataFromFile {
     Vertex: Vertex[];
 }

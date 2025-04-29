@@ -14,7 +14,9 @@ private:
     
 public:
     int id;
+    Vertex() {};
     Vertex(double x, double y);
+    virtual ~Vertex() = default;
     Location location;
 
     void print();
@@ -23,7 +25,7 @@ public:
 class Field : public Vertex{
 public:
     float production;
-    Field(double x, double y, float production);  
+    Field(double x, double y, float production);
 };
 
 class Brewery : public Vertex{

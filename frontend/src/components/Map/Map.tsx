@@ -71,7 +71,7 @@ export const Map = () => {
             context.textAlign = 'center';
             context.textBaseline = 'middle';
 
-            context.fillText(`id: ${v.id}`, v.position.x+mapPos.x + 20-6, v.position.y+mapPos.y+4);
+            context.fillText(`${v.type} id: ${v.id}`, v.position.x+mapPos.x+10, v.position.y+mapPos.y+10);
         });
 
         context.restore();

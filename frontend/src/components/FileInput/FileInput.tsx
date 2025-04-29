@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Vertex} from "../../interfaces/interfaces.ts";
+import {Cross, Field, Vertex} from "../../interfaces/interfaces.ts";
 import './FileInput.css'
 
 export const FileInput = () => {
@@ -19,9 +19,19 @@ export const FileInput = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const text = e.target?.result as string;
-            const a = text.split("\n");
-            const b = a.map( l => l.split(" "))
-            const data = b.map(e=> ({type: e[0], position: {x: Number(e[1]),y: Number(e[2])}} as Vertex))
+            const linesArr = text.split("\n");
+            const wordsArr = linesArr.map( l => l.split(" "))
+            // if("ABC".includes(b[0][0]))
+
+            const data = wordsArr.map(e=> {
+                if(e[0] === "F")
+                    return ({type: e[0], production: Number(e[3] ?? 0), position: {x: Number(e[1]),y: Number(e[2])}} as Field)
+                else if(e[0] === "C")
+                    return ({type: e[0], limit: Number(e[3] ?? 0), position: {x: Number(e[1]),y: Number(e[2])}} as Cross)
+
+                return ({type: e[0], position: {x: Number(e[1]),y: Number(e[2])}} as Vertex)
+            })
+
             console.log(data);
             setJsonData(data);
         };

@@ -1,7 +1,7 @@
 #include "./headers/router.hpp"
 #include "./headers/vertex.hpp"
 
-Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex>& allVertices, std::string path)
+Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::string path)
         : app_(app), allVertices(allVertices), path(path) {
     setupRoutes();
 }
@@ -46,7 +46,23 @@ void Router::setupRoutes() {
                                 return crow::response(400, "Invalid item in list");
                             }
 
-                            Vertex v(item["position"]["x"].d(), item["position"]["y"].d());
+                            Vertex* v;
+                            switch(((std::string)item["type"].s())[0]){
+                                case 'F':
+                                    v = new Field(item["position"]["x"].d(), item["position"]["y"].d(), item["production"].d());
+                                    break;
+                                case 'B':
+                                    v = new Brewery(item["position"]["x"].d(), item["position"]["y"].d());
+                                    break;
+                                case 'C':
+                                    v = new Cross(item["position"]["x"].d(), item["position"]["y"].d(), item["limit"].d());
+                                    break;
+                                case 'I':
+                                    v = new Inn(item["position"]["x"].d(), item["position"]["y"].d());
+                                    break;
+                                default:
+                                    v = new Vertex(item["position"]["x"].d(), item["position"]["y"].d());
+                            }
                             this->allVertices.push_back(v);
                             i++;
                         }
@@ -64,11 +80,31 @@ void Router::setupRoutes() {
                         vertices_json = crow::json::wvalue::list();
 
                         int i = 0;
-                        for (const auto& v : this->allVertices) {
+                        for (auto& v : this->allVertices) {
+
                             crow::json::wvalue vertex;
-                            vertex["id"] = v.id;
-                            vertex["position"]["x"] = v.location.x;
-                            vertex["position"]["y"] = v.location.y;
+                            vertex["id"] = v->id;
+                            vertex["type"] = "vertex";
+                            vertex["position"]["x"] = v->location.x;
+                            vertex["position"]["y"] = v->location.y;
+                            vertex["production"] = 0;
+
+                            if(auto field = dynamic_cast<Field*>(v)){
+                                vertex["type"] = "field";
+                                vertex["production"] = field->production;
+                            }
+                            else if(auto brewery = dynamic_cast<Brewery*>(v)){
+                                vertex["type"] = "brewery";
+                                vertex["ratio"] = brewery->ratio;
+                            }
+                            else if(auto cross = dynamic_cast<Cross*>(v)){
+                                vertex["type"] = "cross";
+                                vertex["limit"] = cross->limit;
+                            }
+                            else if(auto field = dynamic_cast<Inn*>(v)){
+                                vertex["type"] = "inn";
+                            }
+
                             vertices_json[i++] = std::move(vertex);
                         }
 
