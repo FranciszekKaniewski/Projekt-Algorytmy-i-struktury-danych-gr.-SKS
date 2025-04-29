@@ -19,3 +19,26 @@ public:
 
     void print();
 };
+
+class Field : public Vertex{
+public:
+    float production;
+    Field(double x, double y, float production);  
+};
+
+class Brewery : public Vertex{
+public:
+    static float ratio;
+    Brewery(double x, double y);  
+};
+
+class Inn : public Vertex {
+public:
+    Inn(double x, double y);
+};
+
+class Cross : public Vertex{
+public:
+    float limit;
+    Cross(double x, double y, float limit);  
+};
