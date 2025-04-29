@@ -10,7 +10,9 @@ class Edge{
         Edge(Vertex* start, Vertex* end, bool isBroken = false);
         Vertex* start;
         Vertex* end;
-        
+
+        static int freeId;
+        int id;
         bool isBroken;
         double length;
     };
