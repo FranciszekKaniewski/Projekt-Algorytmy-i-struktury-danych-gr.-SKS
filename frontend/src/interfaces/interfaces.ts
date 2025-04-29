@@ -11,6 +11,12 @@ export interface Cross extends Vertex{
     limit: number;
 }
 
+export interface Edge extends Vertex{
+    id: number;
+    fromId: number;
+    toId: number;
+}
+
 export interface jsonDataFromFile {
     Vertex: Vertex[];
 }
