@@ -18,7 +18,7 @@ export const Map = () => {
 
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
-    const [pin, setPin] = useState<Vertex|Field|Cross|null>(null);
+    const [pin, setPin] = useState<Vertex|Field|Cross|Edge|null>(null);
 
     const lastMousePos = useRef<{ x: number, y: number } | null>(null);
 
@@ -62,8 +62,11 @@ export const Map = () => {
         setEdges([]);
     }
 
-    const showDetails = (e: Vertex|Field|Cross) => {
-        if ("limit" in e) {
+    const showDetails = (e: Vertex|Field|Cross|Edge) => {
+        if("fromId" in e){
+            setPin({id: e.id, fromId: e.fromId, toId: e.toId});
+        }
+        else if ("limit" in e) {
             setPin({id: e.id, position: e.position, type: e.type, limit: e.limit});
         }
         else if ("production" in e) {
@@ -119,7 +122,13 @@ export const Map = () => {
         const vFrom = vertices.filter(v => v.id == e.fromId)[0];
         const vTo = vertices.filter(v => v.id == e.toId)[0];
 
-        return <Line key={"e"+e.id} stroke={'grey'} points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y]}/>
+        return <Line
+            key={"e"+e.id}
+            stroke={'grey'}
+            points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y]}
+            onMouseEnter={() => showDetails(e)}
+            onMouseLeave={() => hideDetails()}
+        />
     })
 
     return(
@@ -153,10 +162,12 @@ export const Map = () => {
                 </Stage>
                 {pin ? <Pin
                     id={pin.id}
-                    type={pin.type}
-                    position={pin.position}
+                    type={"type" in pin ? pin.type : "edge"}
+                    position={"position" in pin ? pin.position : null}
                     limit={"limit" in pin ? pin.limit : null}
                     production={"production" in pin ? pin.production : null}
+                    fromId={"fromId" in pin ? pin.fromId : null}
+                    toId={"toId" in pin ? pin.toId : null}
                 /> : null}
             </div>
         </>
