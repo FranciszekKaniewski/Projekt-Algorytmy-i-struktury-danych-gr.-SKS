@@ -1,0 +1,7 @@
+.pin{
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: rgba(33, 53, 71, 0.25);
+    border-radius: 15px;
+}

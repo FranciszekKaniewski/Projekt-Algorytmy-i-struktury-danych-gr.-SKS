@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useRef, useState,} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
 import {Cross, Edge, Field, Vertex} from "../../interfaces/interfaces.ts";
 import './FileInput.css'
@@ -8,12 +8,18 @@ export const FileInput = () => {
     const [jsonEdgesData, setJsonEdgesData] = useState<Edge[]>([]);
     const [message, setMessage] = useState("");
 
+    const file = useRef<HTMLInputElement>(null);
+
     const sendHandler = async () => {
+        if(!jsonVertexData.length && !jsonEdgesData.length) return
         const res = await Fetch("/api/vertices","POST",jsonVertexData as Vertex[]);
         setMessage(res as string);
 
         const res2 = await Fetch("/api/edges","POST",jsonEdgesData as Edge[]);
         setMessage(res2 as string);
+        file.current = null;
+        setJsonVertexData([]);
+        setJsonEdgesData([]);
     }
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,12 +61,17 @@ export const FileInput = () => {
             <span>Test files: </span>
             <a href="/test-file-1.txt" target="_blank"> plik_1</a> |
             <a href="/test-file-2.txt" target="_blank"> plik_2</a>
-            <div style={jsonVertexData.length ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
+            <div style={file.current ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
                  className="dropzone">
-                <input onChange={e => handleFileChange(e)} type="file" accept=".txt" className="file-input"/>
-                <p className="dropzone-text">{!jsonVertexData.length ? "Umieść plik tutaj lub kliknij" : "Plik dodany poprawnie!"}</p>
+                <input
+                    onChange={e => handleFileChange(e)}
+                    ref={file} type="file"
+                    accept=".txt"
+                    className="file-input"
+                />
+                <p className="dropzone-text">{!file.current ? "Umieść plik tutaj lub kliknij" : "Plik dodany poprawnie!"}</p>
             </div>
-            <button onClick={() => sendHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded">
+            <button onClick={() => sendHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded" disabled={!jsonVertexData.length && !jsonEdgesData.length}>
                 Wyślij na backend
             </button>
             <p>{message}</p>

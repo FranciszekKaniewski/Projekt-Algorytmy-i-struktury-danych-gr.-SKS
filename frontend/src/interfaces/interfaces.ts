@@ -1,6 +1,6 @@
 export interface Vertex {
     id: number;
-    type?: string;
+    type: string;
     position: {x: number; y: number};
 }
 
@@ -11,7 +11,7 @@ export interface Cross extends Vertex{
     limit: number;
 }
 
-export interface Edge extends Vertex{
+export interface Edge{
     id: number;
     fromId: number;
     toId: number;
