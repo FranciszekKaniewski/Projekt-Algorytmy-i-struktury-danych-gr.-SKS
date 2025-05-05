@@ -25,7 +25,7 @@ Vertex* Vertex::findOnePtrById(vector<Vertex *> &arr, int id) {
 
 Field::Field(double x, double y, float production) : Vertex(x,y), production(production) {};
 
-Brewery::Brewery(double x, double y) : Vertex(x,y) {};
+Brewery::Brewery(double x, double y) : Vertex(x,y), storage(0) {};
 
 float Brewery::ratio = 2.5; 
 

@@ -60,7 +60,8 @@ export const FileInput = () => {
         <div className="p-4 flex flex-col items-center">
             <span>Test files: </span>
             <a href="/test-file-1.txt" target="_blank"> plik_1</a> |
-            <a href="/test-file-2.txt" target="_blank"> plik_2</a>
+            <a href="/test-file-2.txt" target="_blank"> plik_2</a> |
+            <a href="/test-file-3.txt" target="_blank"> plik_3</a>
             <div style={file.current ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
                  className="dropzone">
                 <input
@@ -71,7 +72,8 @@ export const FileInput = () => {
                 />
                 <p className="dropzone-text">{!file.current ? "Umieść plik tutaj lub kliknij" : "Plik dodany poprawnie!"}</p>
             </div>
-            <button onClick={() => sendHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded" disabled={!jsonVertexData.length && !jsonEdgesData.length}>
+            <button onClick={() => sendHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded"
+                    disabled={!jsonVertexData.length && !jsonEdgesData.length}>
                 Wyślij na backend
             </button>
             <p>{message}</p>

@@ -1,5 +1,6 @@
 #include "./headers/router.hpp"
 #include "./headers/vertex.hpp"
+#include "./headers/maxFlowSolver.hpp"
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
         : app_(app), allVertices(allVertices), allEdges(allEdges), path(path) {
@@ -183,5 +184,61 @@ void Router::setupRoutes() {
                         std::ostringstream os;
                         os << i << " Edges and Vertices Deleted!";
                         return crow::response(os.str());
+                    });
+
+    this->app_.route_dynamic(this->path+"/max-flow")
+            .methods(crow::HTTPMethod::Post)
+                    ([this]() {
+                        this->maxFlowSolver = MaxFlowSolver(this->allVertices, this->allEdges);
+
+                        vector<tuple<int,int,float>> used_edges;
+                        float result = this->maxFlowSolver.maxFlow(used_edges);
+
+                        crow::json::wvalue vertices_json;
+                        vertices_json = crow::json::wvalue::list();
+                        int i =0;
+
+                        crow::json::wvalue maxBarleyFlow;
+                        maxBarleyFlow["maxBarleyFlow"] = result;
+                        vertices_json[i++] = std::move(maxBarleyFlow);
+
+                        for (auto& [u, v, f] : used_edges) {
+                            crow::json::wvalue path;
+                            path["fromId"] = u;
+                            path["toId"] = v;
+                            path["amount"] = f;
+                            path["transports"] = "barley";
+
+                            vertices_json[i++] = std::move(path);
+                        }
+
+                        for (auto& [u, v, f] : used_edges) {
+                            if (auto b = dynamic_cast<Brewery*>(this->allVertices[v])) {
+                                b->storage += f * Brewery::ratio;
+                                this->maxFlowSolver.capacity[b->id][this->maxFlowSolver.barleySink] = b->storage;
+                                this->maxFlowSolver.capacity[this->maxFlowSolver.barleySink][b->id] = b->storage;
+                            }
+                        }
+
+                        this->maxFlowSolver.isBeerCreated = true;
+
+                        used_edges.clear();
+                        result = this->maxFlowSolver.maxFlow(used_edges);
+
+                        crow::json::wvalue maxBeerFlow;
+                        maxBeerFlow["maxBeerFlow"] = result;
+                        vertices_json[i++] = std::move(maxBeerFlow);
+
+                        for (auto& [u, v, f] : used_edges) {
+                            crow::json::wvalue path;
+                            path["fromId"] = u;
+                            path["toId"] = v;
+                            path["amount"] = f;
+                            path["transports"] = "beer";
+
+                            vertices_json[i++] = std::move(path);
+                        }
+
+                        return crow::response(vertices_json);
                     });
 }

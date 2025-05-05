@@ -17,6 +17,13 @@ export interface Edge{
     toId: number;
 }
 
+export interface Path{
+    fromId: number;
+    toId: number;
+    amount: number;
+    transports: string;
+}
+
 export interface jsonDataFromFile {
     Vertex: Vertex[];
 }

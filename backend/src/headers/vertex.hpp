@@ -30,6 +30,7 @@ public:
 class Brewery : public Vertex{
 public:
     static float ratio;
+    float storage;
     Brewery(double x, double y);  
 };
 

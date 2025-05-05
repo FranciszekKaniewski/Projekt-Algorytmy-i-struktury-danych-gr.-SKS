@@ -1,8 +1,8 @@
 import {useRef, useState} from "react";
 import {Canvas} from "../Canvas/Canvas.tsx";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Cross, Edge, Field, Vertex} from "../../interfaces/interfaces.ts";
-import {Stage, Layer, Rect, Circle, Line} from "react-konva";
+import {Cross, Edge, Field, Path, Vertex} from "../../interfaces/interfaces.ts";
+import {Stage, Layer, Rect, Circle, Line, Text, Arrow} from "react-konva";
 import {KonvaEventObject} from "konva/lib/Node";
 import {Pin} from "../Pin/Pin.tsx";
 
@@ -19,6 +19,9 @@ export const Map = () => {
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [pin, setPin] = useState<Vertex|Field|Cross|Edge|null>(null);
+
+    const [pathing, setPathing] = useState<Path[]>([]);
+    const [showPaths, setShowPaths] = useState<"barley"|"beer"|null>(null);
 
     const lastMousePos = useRef<{ x: number, y: number } | null>(null);
 
@@ -58,8 +61,10 @@ export const Map = () => {
     }
     const clearHandler = async () => {
         await Fetch('/api/clear',"POST");
+        setPathing([]);
         setVertices([]);
         setEdges([]);
+        setShowPaths(null);
     }
 
     const showDetails = (e: Vertex|Field|Cross|Edge) => {
@@ -76,6 +81,23 @@ export const Map = () => {
     }
     const hideDetails = () => {
         setPin(null);
+    }
+
+    const maxFlowHandler = async () => {
+        if(showPaths === "barley"){
+            setShowPaths("beer");
+            return;
+        }else if(showPaths === "beer"){
+            setShowPaths("barley");
+            return;
+        }
+
+        const res = await Fetch('/api/max-flow',"POST") as string;
+
+        const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => !("maxBeerFlow" in e) && !("maxBarleyFlow" in e));
+
+        setShowPaths("barley");
+        setPathing(paths);
     }
 
     //Draw
@@ -131,6 +153,41 @@ export const Map = () => {
         />
     })
 
+    const drawPathing = pathing.filter(e => showPaths === e.transports).map((e,i) => {
+        const vFrom = vertices.filter(v => v.id == e.fromId)[0];
+        const vTo = vertices.filter(v => v.id == e.toId)[0];
+
+        return (
+            <>
+                <Text
+                    x={(vFrom.position.x+vTo.position.x)/2 - 20}
+                    y={(vFrom.position.y+vTo.position.y)/2}
+                    fill={'black'}
+                    text={e.amount.toFixed(2).toString()}
+                    fontSize={12/scale}
+                    fontFamily={'Calibri'}
+                />
+                <Text
+                    x={(vFrom.position.x+vTo.position.x)/2 - 20}
+                    y={(vFrom.position.y+vTo.position.y)/2}
+                    fill={'black'}
+                    text={e.amount.toFixed(2).toString()}
+                    fontSize={12/scale}
+                    fontFamily={'Calibri'}
+                />
+                <Arrow
+                    key={"p"+i}
+                    stroke={'red'}
+                    points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y-10]}
+                    pointerLength={20}
+                    pointerWidth={20}
+                    // onMouseEnter={() => showDetails(e)}
+                    // onMouseLeave={() => hideDetails()}
+                />
+            </>
+        )
+    })
+
     return(
         <>
             <h4 className="mouse-cordinats">
@@ -142,6 +199,11 @@ export const Map = () => {
                 <button onClick={() => setScale(prev => prev > 1 ? prev - 1 : prev / 2)}>-</button>
                 <button className='refresh-btn' onClick={refreshHandler}>Odźwierz</button>
                 <button className='refresh-btn' onClick={clearHandler}>Wyszyść dane</button>
+                <button
+                    className='refresh-btn'
+                    onClick={maxFlowHandler}>
+                    {showPaths===null ? "Oblicz MaxFlow" : showPaths==="barley" ? "Pokaż scieszki dla piwa" : "Pokaż scieszki dla jęczmienia"}
+                </button>
             </div>
 
             <div style={{ position: 'relative', width: 800, height: 800, margin: "auto" }}>
@@ -158,6 +220,7 @@ export const Map = () => {
                     <Circle radius={6} x={0} y={0} fill='red' />
                         {drawE}
                         {drawV}
+                        {drawPathing}
                     </Layer>
                 </Stage>
                 {pin ? <Pin
