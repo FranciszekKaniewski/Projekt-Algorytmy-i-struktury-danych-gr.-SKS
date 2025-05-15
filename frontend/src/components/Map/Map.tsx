@@ -1,6 +1,5 @@
 import {useRef, useState} from "react";
 import {Canvas} from "../Canvas/Canvas.tsx";
-import {Fetch} from "../../utils/Fetch.tsx";
 import {Cross, Edge, Field, Path, Vertex} from "../../interfaces/interfaces.ts";
 import {Stage, Layer, Rect, Circle, Line, Text, Arrow} from "react-konva";
 import {KonvaEventObject} from "konva/lib/Node";
@@ -8,7 +7,14 @@ import {Pin} from "../Pin/Pin.tsx";
 
 import "./map.css";
 
-export const Map = () => {
+type Props = {
+    vertices:Vertex[];
+    edges: Edge[];
+    pathing: Path[];
+    showPaths: "barley"|"beer"|null;
+}
+
+export const Map = ({vertices,edges,pathing,showPaths}:Props) => {
 
     //States
     const [isDragging, setIsDragging] = useState(false);
@@ -16,12 +22,7 @@ export const Map = () => {
     const [pointerPos, setPointerPos] = useState({x: 0,y: 0})
     const [scale, setScale] = useState(1);
 
-    const [vertices, setVertices] = useState<Vertex[]>([]);
-    const [edges, setEdges] = useState<Edge[]>([]);
     const [pin, setPin] = useState<Vertex|Field|Cross|Edge|null>(null);
-
-    const [pathing, setPathing] = useState<Path[]>([]);
-    const [showPaths, setShowPaths] = useState<"barley"|"beer"|null>(null);
 
     const lastMousePos = useRef<{ x: number, y: number } | null>(null);
 
@@ -52,21 +53,6 @@ export const Map = () => {
         }
     }
 
-    const refreshHandler = async () => {
-        const res = await Fetch('/api/vertices',"GET") as string;
-        setVertices(JSON.parse(res));
-
-        const res2 = await Fetch('/api/edges',"GET") as string;
-        setEdges(JSON.parse(res2));
-    }
-    const clearHandler = async () => {
-        await Fetch('/api/clear',"POST");
-        setPathing([]);
-        setVertices([]);
-        setEdges([]);
-        setShowPaths(null);
-    }
-
     const showDetails = (e: Vertex|Field|Cross|Edge) => {
         if("fromId" in e){
             setPin({id: e.id, fromId: e.fromId, toId: e.toId});
@@ -81,23 +67,6 @@ export const Map = () => {
     }
     const hideDetails = () => {
         setPin(null);
-    }
-
-    const maxFlowHandler = async () => {
-        if(showPaths === "barley"){
-            setShowPaths("beer");
-            return;
-        }else if(showPaths === "beer"){
-            setShowPaths("barley");
-            return;
-        }
-
-        const res = await Fetch('/api/max-flow',"POST") as string;
-
-        const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => !("maxBeerFlow" in e) && !("maxBarleyFlow" in e));
-
-        setShowPaths("barley");
-        setPathing(paths);
     }
 
     //Draw
@@ -197,13 +166,6 @@ export const Map = () => {
                 <span> {scale} </span>
                 <button onClick={() => setScale(prev => prev >= 1 ? prev + 1 : prev * 2)}>+</button>
                 <button onClick={() => setScale(prev => prev > 1 ? prev - 1 : prev / 2)}>-</button>
-                <button className='refresh-btn' onClick={refreshHandler}>Odźwierz</button>
-                <button className='refresh-btn' onClick={clearHandler}>Wyszyść dane</button>
-                <button
-                    className='refresh-btn'
-                    onClick={maxFlowHandler}>
-                    {showPaths===null ? "Oblicz MaxFlow" : showPaths==="barley" ? "Pokaż scieszki dla piwa" : "Pokaż scieszki dla jęczmienia"}
-                </button>
             </div>
 
             <div style={{ position: 'relative', width: 800, height: 800, margin: "auto" }}>

@@ -1,30 +1,64 @@
-import React, {useRef, useState,} from "react";
+import React, {useCallback, useEffect, useRef, useState,} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Cross, Edge, Field, Vertex} from "../../interfaces/interfaces.ts";
+import {Cross, Edge, Field, Vertex, Path} from "../../interfaces/interfaces.ts";
 import './FileInput.css'
 
-export const FileInput = () => {
+type Props = {
+    setVertices: (data:Vertex[])=> void;
+    setEdges: (data:Edge[]) => void;
+    setPathing: (data:Path[]) => void;
+    showPaths: "barley"|"beer"|null;
+    setShowPaths: (data:"barley"|"beer"|null) => void;
+}
+
+export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPaths}:Props) => {
     const [jsonVertexData, setJsonVertexData] = useState<Vertex[]>([]);
     const [jsonEdgesData, setJsonEdgesData] = useState<Edge[]>([]);
-    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState<string[]>([]);
 
     const file = useRef<HTMLInputElement>(null);
+    const [fileName, setFileName] = useState("");
+
+    const runEffect = useRef(false);
+
+    const fetchData = useCallback(async () => {
+        const resV = await Fetch('/api/vertices',"GET") as string;
+        setVertices(JSON.parse(resV));
+
+        const resE = await Fetch('/api/edges',"GET") as string;
+        setEdges(JSON.parse(resE));
+    },[setEdges, setVertices])
+
+    useEffect(() => {
+        if(!runEffect.current){
+            (async () => await fetchData())();
+
+            return () => {runEffect.current = true};
+        }
+    },[fetchData, setEdges, setVertices]);
 
     const sendHandler = async () => {
         if(!jsonVertexData.length && !jsonEdgesData.length) return
         const res = await Fetch("/api/vertices","POST",jsonVertexData as Vertex[]);
-        setMessage(res as string);
+        setMessages(prevState => [...prevState, res as string]);
 
         const res2 = await Fetch("/api/edges","POST",jsonEdgesData as Edge[]);
-        setMessage(res2 as string);
-        file.current = null;
+        setMessages(prevState => [...prevState, res2 as string]);
+
         setJsonVertexData([]);
         setJsonEdgesData([]);
+        if(file.current){
+            file.current.value = "";
+        }
+        setFileName("");
+
+        await fetchData();
     }
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
+        const f = event.target.files?.[0];
+        if (!f) return;
+        setFileName(f.name);
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -50,11 +84,41 @@ export const FileInput = () => {
                 }
             })
         };
-        reader.readAsText(file);
+        reader.readAsText(f);
 
         setJsonVertexData([]);
         setJsonEdgesData([]);
     };
+
+    const deleteHandler = async () => {
+        const res = await Fetch('/api/clear',"POST");
+        setVertices([]);
+        setEdges([]);
+        setPathing([]);
+        setShowPaths(null);
+        if(file.current){
+            file.current.value = "";
+        }
+        setFileName("");
+        setMessages([res as string]);
+    }
+
+    const maxFlowHandler = async () => {
+        if(showPaths === "barley"){
+            setShowPaths("beer");
+            return;
+        }else if(showPaths === "beer"){
+            setShowPaths("barley");
+            return;
+        }
+
+        const res = await Fetch('/api/max-flow',"POST") as string;
+
+        const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => !("maxBeerFlow" in e) && !("maxBarleyFlow" in e));
+
+        setShowPaths("barley");
+        setPathing(paths);
+    }
 
     return (
         <div className="p-4 flex flex-col items-center">
@@ -62,7 +126,7 @@ export const FileInput = () => {
             <a href="/test-file-1.txt" target="_blank"> plik_1</a> |
             <a href="/test-file-2.txt" target="_blank"> plik_2</a> |
             <a href="/test-file-3.txt" target="_blank"> plik_3</a>
-            <div style={file.current ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
+            <div style={fileName.length ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
                  className="dropzone">
                 <input
                     onChange={e => handleFileChange(e)}
@@ -70,13 +134,21 @@ export const FileInput = () => {
                     accept=".txt"
                     className="file-input"
                 />
-                <p className="dropzone-text">{!file.current ? "Umieść plik tutaj lub kliknij" : "Plik dodany poprawnie!"}</p>
+                <p className="dropzone-text">{!fileName.length ? "Umieść plik tutaj lub kliknij" : "Plik dodany poprawnie!"}</p>
             </div>
             <button onClick={() => sendHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded"
                     disabled={!jsonVertexData.length && !jsonEdgesData.length}>
                 Wyślij na backend
             </button>
-            <p>{message}</p>
+            <button onClick={() => deleteHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded">
+                Wyczyść dane
+            </button>
+            {messages.map((m, i) => <p key={i}>{m}</p>)}
+            <button
+                className='refresh-btn'
+                onClick={maxFlowHandler}>
+                {showPaths === null ? "Oblicz MaxFlow" : showPaths === "barley" ? "Pokaż scieszki dla piwa" : "Pokaż scieszki dla jęczmienia"}
+            </button>
         </div>
     )
 }

@@ -4,13 +4,16 @@ import crowLogo from './assets/crowLogo.png'
 import './App.css'
 import {useState} from "react";
 import {FileInput} from "./components/FileInput/FileInput.tsx";
-import {Fetch} from "./utils/Fetch.tsx";
 import {Map} from "./components/Map/Map.tsx";
+import {Edge, Path, Vertex} from "./interfaces/interfaces.ts";
 
 function App() {
 
-    const [message, setMessage] = useState("")
-    const [messageSecond, setMessageSecond] = useState("")
+    const [vertices, setVertices] = useState<Vertex[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
+
+    const [pathing, setPathing] = useState<Path[]>([]);
+    const [showPaths, setShowPaths] = useState<"barley"|"beer"|null>(null);
 
   return (
       <>
@@ -28,12 +31,8 @@ function App() {
               </a>
           </div>
           <h2>Vite + React + Crow cpp</h2>
-          <button onClick={async () => setMessage(await Fetch('/api', "GET") as string)}>GET API TEST</button>
-          <p>{message}</p>
-          <button onClick={async () => setMessageSecond(await Fetch(`/api/add-json`, "POST", { a:4,b:5 }) as string)}>POST API TEST</button>
-          <p>{messageSecond}</p>
-          <FileInput/>
-          <Map/>
+          <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths} setShowPaths={setShowPaths} />
+          <Map vertices={vertices ?? []} edges={edges ?? []} pathing={pathing} showPaths={showPaths}/>
       </>
   )
 }
