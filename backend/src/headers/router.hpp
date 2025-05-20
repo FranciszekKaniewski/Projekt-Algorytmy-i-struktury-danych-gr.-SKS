@@ -3,6 +3,7 @@
 #include "vertex.hpp"
 #include "Edge.hpp"
 #include "maxFlowSolver.hpp"
+#include "mapQuadrants.hpp"
 
 class Router {
 public:
@@ -13,6 +14,7 @@ private:
     std::vector<Vertex*> allVertices;
     std::vector<Edge*> allEdges;
     MaxFlowSolver maxFlowSolver;
+    MapQuadrants mapQuadrants;
     crow::App<crow::CORSHandler>& app_;
     std::string path;
 };

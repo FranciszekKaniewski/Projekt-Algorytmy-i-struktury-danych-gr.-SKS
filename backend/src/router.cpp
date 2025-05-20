@@ -1,6 +1,8 @@
 #include "./headers/router.hpp"
 #include "./headers/vertex.hpp"
 #include "./headers/maxFlowSolver.hpp"
+#include "./headers/mapQuadrants.hpp"
+#include <initializer_list>
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
         : app_(app), allVertices(allVertices), allEdges(allEdges), path(path) {
@@ -241,4 +243,18 @@ void Router::setupRoutes() {
 
                         return crow::response(vertices_json);
                     });
+
+    this->app_.route_dynamic(this->path+"/quadrants")
+            .methods(crow::HTTPMethod::Get)
+                    ([this]() {
+                        vector<pair<initializer_list<Point>, float>> points;
+                        points.push_back({{{100, 100}, {300, 100}, {300, 300}, {100, 300}}, 50});
+                        points.push_back({{{-300, 100}, {-100, 100}, {-50, 300}, {-350, 300}}, 40});
+                        points.push_back({{{-300, -300}, {-100, -300}, {-50, -200}, {-200, -100}, {-350, -200}}, 30});
+                        points.push_back({{{100, -100}, {300, -100}, {250, -300}, {50, -300}}, 20}); 
+
+                        this->mapQuadrants = MapQuadrants(this->allVertices, points);
+                        return "xd";
+                    });
+
 }
