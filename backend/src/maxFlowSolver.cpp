@@ -9,6 +9,8 @@ MaxFlowSolver::MaxFlowSolver(std::vector<Vertex*>& vertices, std::vector<Edge*>&
     barleySink = n + 1;
     sink = n + 2;
 
+    isBeerCreated = false;
+
     capacity.assign(n + 3, vector<float>(n + 3, 0));
     flowPassed.assign(n + 3, vector<float>(n + 3, 0));
     adj.resize(n + 3);
@@ -75,7 +77,7 @@ bool MaxFlowSolver::bfs(std::vector<float>& parent){
     return false;
 }
 
-float MaxFlowSolver::maxFlow(std::vector<tuple<int,int,float>>& used_edges) {
+float MaxFlowSolver::maxFlow(std::vector<tuple<int,int,float>>& used_edges, std::vector<Vertex*> vertices) {
 
     for (auto& row : flowPassed)
         std::fill(row.begin(), row.end(), 0);
@@ -114,6 +116,14 @@ float MaxFlowSolver::maxFlow(std::vector<tuple<int,int,float>>& used_edges) {
         for (int v : adj[u]) {
             if (flowPassed[u][v] > 0 && u != s && v != t) {
                 used_edges.emplace_back(u, v, flowPassed[u][v]);
+
+                if (auto* b = dynamic_cast<Brewery*>(vertices[v])) {
+                    if(isBeerCreated == false) {
+                        b->storage += flowPassed[u][v] * Brewery::ratio;
+                        this->capacity[b->id][this->barleySink] = b->storage;
+                        this->capacity[this->barleySink][b->id] = b->storage;
+                    }
+                }
             }
         }
     }

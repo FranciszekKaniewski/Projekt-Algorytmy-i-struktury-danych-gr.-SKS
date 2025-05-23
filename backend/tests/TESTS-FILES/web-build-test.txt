@@ -1,0 +1,99 @@
+F 100 100 10
+C 200 100 5
+B 300 100
+
+E 0 1
+E 1 2
+
+Source: 3
+BarleySink: 4
+Sink: 5
+isBeerReady: 0
+
+
+Capacity 0 = 0 5 0 0 0 0
+Capacity 1 = 5 0 5 0 0 0
+Capacity 2 = 0 5 0 0 INF 0
+Capacity 3 = 10 0 0 0 0 0
+Capacity 4 = 0 0 INF 0 0 0
+Capacity 5 = 0 0 0 0 0 0
+
+FlowPassed 0 = 0 0 0 0 0 0
+FlowPassed 1 = 0 0 0 0 0 0
+FlowPassed 2 = 0 0 0 0 0 0
+FlowPassed 3 = 0 0 0 0 0 0
+FlowPassed 4 = 0 0 0 0 0 0
+FlowPassed 5 = 0 0 0 0 0 0
+
+Adj 0 = 1 3
+Adj 1 = 0 2
+Adj 2 = 1 4
+Adj 3 = 0
+Adj 4 = 2
+Adj 5 =
+
+END
+
+F 100 100 10
+C 200 100 5
+B 300 100
+
+E 0 1
+E 1 2
+
+isBeerReady: 0
+
+Adj 0 = 3 1
+Adj 1 = 0 2
+Adj 2 = 1 4
+Adj 3 = 0
+Adj 4 = 2
+Adj 5 =
+
+END
+
+F 100 100 4
+F 100 100 2
+F 100 100 8
+C 200 100 9
+B 300 100
+C 100 100 10
+I 100 100
+
+E 0 3
+E 1 3
+E 2 3
+E 3 4
+E 4 0
+E 0 5
+E 5 6
+
+Source: 7
+BarleySink: 8
+Sink: 9
+isBeerReady: 0
+
+
+Capacity 0 = 0 0 0 9 INF 10 0 0 0 0
+Capacity 1 = 0 0 0 9 0 0 0 0 0 0
+Capacity 2 = 0 0 0 9 0 0 0 0 0 0
+Capacity 3 = 9 9 9 0 9 0 0 0 0 0
+Capacity 4 = INF 0 0 9 0 0 0 0 INF 0
+Capacity 5 = 10 0 0 0 0 0 10 0 0 0
+Capacity 6 = 0 0 0 0 0 10 0 0 0 INF
+Capacity 7 = 4 2 8 0 0 0 0 0 0 0
+Capacity 8 = 0 0 0 0 INF 0 0 0 0 0
+Capacity 9 = 0 0 0 0 0 0 0 0 0 0
+
+Adj 0 = 7 3 5 4
+Adj 1 = 7 3
+Adj 2 = 7 3
+Adj 3 = 0 1 2 4
+Adj 4 = 3 0 8
+Adj 5 = 0 6
+Adj 6 = 5 9
+Adj 7 = 0 1 2
+Adj 8 = 4
+Adj 9 = 6
+
+END

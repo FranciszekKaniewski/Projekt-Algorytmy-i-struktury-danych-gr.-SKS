@@ -8,7 +8,7 @@ H_FILES_DIR := src/headers
 CPP_FILES := $(wildcard src/*.cpp)
 MAIN_CPP_FILE := main.cpp
 
-
+# ============ APP
 build:
 	@mkdir -p exe
 	g++ -I $(H_FILES_DIR) -I $(CROW) -I $(CROW_MIDDLEWARES) -I $(INCLUDES) -o $(OUT_NAME) $(CPP_FILES) $(MAIN_CPP_FILE)
@@ -20,6 +20,19 @@ bar:
 	@$(MAKE) build
 	@$(MAKE) run
 
-docker:
-	docker build -t my-crow-app .
-	docker run -it --rm --name Projekt-Algorytmy -p 3000:3000 -p 5173:5173 my-crow-app sh -c "make bar"
+# ============ TESTS
+
+HEADERS_TESTS_FILES := tests/headers
+TESTS_CPP_FILES := $(wildcard tests/*.cpp)
+TESTS_OUT_NAME := ./exe/tests
+
+build-tests:
+	@mkdir -p exe
+	g++ -I $(H_FILES_DIR) -I $(CROW) -I $(CROW_MIDDLEWARES) -I $(INCLUDES) -o $(TESTS_OUT_NAME) $(TESTS_CPP_FILES) $(CPP_FILES)
+
+run-tests:
+	./exe/tests
+
+bar-tests:
+	@$(MAKE) build-tests
+	@$(MAKE) run-tests

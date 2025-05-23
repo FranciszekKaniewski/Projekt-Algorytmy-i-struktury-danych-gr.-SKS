@@ -1,5 +1,16 @@
 version: '3.7'
 services:
+
+  tests:
+    build: ./backend
+    command: bash -c "make bar-tests"
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
+    profiles:
+      - test
+
   backend:
     build: ./backend
     command: bash -c "make bar"

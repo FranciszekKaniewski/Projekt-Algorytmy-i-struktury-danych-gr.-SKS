@@ -194,7 +194,7 @@ void Router::setupRoutes() {
                         this->maxFlowSolver = MaxFlowSolver(this->allVertices, this->allEdges);
 
                         vector<tuple<int,int,float>> used_edges;
-                        float result = this->maxFlowSolver.maxFlow(used_edges);
+                        float result = this->maxFlowSolver.maxFlow(used_edges,this->allVertices);
 
                         crow::json::wvalue vertices_json;
                         vertices_json = crow::json::wvalue::list();
@@ -214,18 +214,10 @@ void Router::setupRoutes() {
                             vertices_json[i++] = std::move(path);
                         }
 
-                        for (auto& [u, v, f] : used_edges) {
-                            if (auto b = dynamic_cast<Brewery*>(this->allVertices[v])) {
-                                b->storage += f * Brewery::ratio;
-                                this->maxFlowSolver.capacity[b->id][this->maxFlowSolver.barleySink] = b->storage;
-                                this->maxFlowSolver.capacity[this->maxFlowSolver.barleySink][b->id] = b->storage;
-                            }
-                        }
-
                         this->maxFlowSolver.isBeerCreated = true;
 
                         used_edges.clear();
-                        result = this->maxFlowSolver.maxFlow(used_edges);
+                        result = this->maxFlowSolver.maxFlow(used_edges,this->allVertices);
 
                         crow::json::wvalue maxBeerFlow;
                         maxBeerFlow["maxBeerFlow"] = result;

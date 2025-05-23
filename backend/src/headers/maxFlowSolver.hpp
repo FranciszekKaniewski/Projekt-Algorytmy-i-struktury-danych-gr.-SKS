@@ -15,5 +15,5 @@ public:
 
     MaxFlowSolver() {};
     MaxFlowSolver(std::vector<Vertex*>& vertices, std::vector<Edge*>& edges);
-    float maxFlow(std::vector<tuple<int,int,float>>& used_edges);
+    float maxFlow(std::vector<tuple<int,int,float>>& used_edges, std::vector<Vertex*> vertices);
 };
