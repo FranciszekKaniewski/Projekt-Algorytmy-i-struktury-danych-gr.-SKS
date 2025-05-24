@@ -51,9 +51,11 @@ void Router::setupRoutes() {
 
                             Vertex* v;
                             switch(((std::string)item["type"].s())[0]){
-                                case 'F':
+                                case 'F': {
                                     v = new Field(item["position"]["x"].d(), item["position"]["y"].d(), item["production"].d());
-                                    break;
+                                    Field* f = dynamic_cast<Field*>(v);
+                                    f->production = mapQuadrants.quadrants[this->mapQuadrants.getQuadrantOfField(f)]->assignedProduction;
+                                    break; }
                                 case 'B':
                                     v = new Brewery(item["position"]["x"].d(), item["position"]["y"].d());
                                     break;
@@ -183,6 +185,11 @@ void Router::setupRoutes() {
                         Edge::freeId = 0;
                         Vertex::counter = 0;
 
+                        for(auto& e : mapQuadrants.quadrants){
+                            delete e;
+                        }
+                        mapQuadrants.quadrants.clear();
+
                         std::ostringstream os;
                         os << i << " Edges and Vertices Deleted!";
                         return crow::response(os.str());
@@ -236,17 +243,69 @@ void Router::setupRoutes() {
                         return crow::response(vertices_json);
                     });
 
+    this->app_.route_dynamic(this->path + "/quadrants")
+            .methods(crow::HTTPMethod::Post)
+                    ([this](const crow::request& req) {
+                        auto body = crow::json::load(req.body);
+                        if (!body) {
+                            return crow::response(400, "Invalid JSON");
+                        }
+
+                        vector<pair<vector<Point>, float>> quadrants;
+
+                        for (const auto& item : body) {
+                            if (!item.has("points") || !item.has("production")) {
+                                return crow::response(400, "Each item must have 'points' and 'production'");
+                            }
+
+                            const auto& jsonPoints = item["points"];
+                            if (jsonPoints.size()<3) {
+                                return crow::response(400, "'points' need at least 3 points!");
+                            }
+
+                            vector<Point> points;
+                            for (const auto& p : jsonPoints) {
+                                if (p.size() != 2) {
+                                    return crow::response(400, "Each point must be an array of two numbers");
+                                }
+
+                                float x = static_cast<float>(p[0].d());
+                                float y = static_cast<float>(p[1].d());
+                                points.push_back(Point{x, y});
+                            }
+
+                            float production = static_cast<float>(item["production"].d());
+
+                            quadrants.emplace_back(points, production);
+                        }
+
+                        this->mapQuadrants = MapQuadrants(this->allVertices, quadrants);
+
+                        return crow::response(200, "Quadrants added!");
+                    });
+
     this->app_.route_dynamic(this->path+"/quadrants")
             .methods(crow::HTTPMethod::Get)
                     ([this]() {
-                        vector<pair<initializer_list<Point>, float>> points;
-                        points.push_back({{{100, 100}, {300, 100}, {300, 300}, {100, 300}}, 50});
-                        points.push_back({{{-300, 100}, {-100, 100}, {-50, 300}, {-350, 300}}, 40});
-                        points.push_back({{{-300, -300}, {-100, -300}, {-50, -200}, {-200, -100}, {-350, -200}}, 30});
-                        points.push_back({{{100, -100}, {300, -100}, {250, -300}, {50, -300}}, 20}); 
+                        crow::json::wvalue vertices_json;
+                        vertices_json = crow::json::wvalue::list();
 
-                        this->mapQuadrants = MapQuadrants(this->allVertices, points);
-                        return "xd";
+                        int i = 0;
+                        for (auto& q : this->mapQuadrants.quadrants) {
+
+                            crow::json::wvalue quadrant;
+                            quadrant["production"] = q->assignedProduction;
+
+                            int j =0;
+                            for(auto& p : q->points){
+                                quadrant["points"][j]["x"] = p.x;
+                                quadrant["points"][j]["y"] = p.y;
+                                j++;
+                            }
+
+                            vertices_json[i++] = std::move(quadrant);
+                        }
+
+                        return crow::response(vertices_json);
                     });
-
 }

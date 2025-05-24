@@ -6,7 +6,7 @@
 
 using namespace std;
 
-MapQuadrants::MapQuadrants(vector<Vertex*> allVertices, vector<pair<initializer_list<Point>, float>> points) {
+MapQuadrants::MapQuadrants(vector<Vertex*> allVertices, vector<pair<vector<Point>, float>> points) {
     for (auto& pair : points) {
         quadrants.push_back(new Quadrant(pair.first, pair.second));
     }
@@ -24,11 +24,17 @@ MapQuadrants::MapQuadrants(vector<Vertex*> allVertices, vector<pair<initializer_
     }
 }
 
-
-Quadrant::Quadrant(initializer_list<Point> numbers, float production){
-    for(Point p : numbers){
-        points.push_back(p);
+int MapQuadrants::getQuadrantOfField(Field *f) {
+    int i = 0;
+    for(Quadrant* q : quadrants){
+        if(q->isInside(f)) return i;
+        i++;
     }
+    return -1;
+}
+
+Quadrant::Quadrant(const vector<Point>& numbers, float production){
+    points = numbers;
     assignedProduction = production;
 };
 

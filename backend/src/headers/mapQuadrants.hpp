@@ -13,19 +13,18 @@ struct Point{
 class Quadrant{
 public:
     vector<Point> points;
-    float assignedProduction;
-    Quadrant(initializer_list<Point> numbers, float production);
+    float assignedProduction = -1;
+    Quadrant(const vector<Point>& numbers, float production);
 
     bool isInside(Field* f);
-
 };
 
 class MapQuadrants{
 public:
     MapQuadrants(){};
-    MapQuadrants(vector<Vertex*> allVertices, vector<pair<initializer_list<Point>, float>> points);
+    MapQuadrants(vector<Vertex*> allVertices, vector<pair<vector<Point>, float>> points);
+
+    int getQuadrantOfField(Field* f);
 
     vector<Quadrant*> quadrants;
-
-
 };
