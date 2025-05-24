@@ -63,7 +63,8 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
         }
         else if ("production" in e) {
             setPin({id: e.id, position: e.position, type: e.type, production: e.production});
-        }else
+        }
+        else
             setPin({id: e.id, position: e.position, type: e.type});
     }
     const hideDetails = () => {
@@ -179,8 +180,8 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
             </h4>
             <div>
                 <span> {scale} </span>
-                <button onClick={() => setScale(prev => prev >= 1 ? prev + 1 : prev * 2)}>+</button>
-                <button onClick={() => setScale(prev => prev > 1 ? prev - 1 : prev / 2)}>-</button>
+                <button disabled={scale >= 10}  onClick={() => setScale(prev => prev >= 1 ? prev + 1 : prev * 2)}>+</button>
+                <button disabled={scale <= 0.125} onClick={() => setScale(prev => prev > 1 ? prev - 1 : prev / 2)}>-</button>
             </div>
 
             <div style={{ position: 'relative', width: 800, height: 800, margin: "auto" }}>

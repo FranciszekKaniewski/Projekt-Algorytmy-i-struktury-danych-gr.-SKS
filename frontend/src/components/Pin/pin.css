@@ -2,6 +2,14 @@
     position: absolute;
     right: 0;
     top: 0;
-    background-color: rgba(33, 53, 71, 0.25);
+    left: 0;
+    bottom: 85%;
+    margin: 20px 10px;
+    background-color: rgb(247, 247, 247);
     border-radius: 15px;
+    border: 1px solid;
+}
+.pin>h3{
+    line-height: 40px;
+    font-weight: 600;
 }

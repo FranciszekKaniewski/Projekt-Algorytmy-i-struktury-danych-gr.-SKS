@@ -20,7 +20,13 @@ function App() {
   return (
       <>
           <h1>Projek Algorytmy i Struktury danych</h1>
-          <h2> Uniwersytet Mikołaja Kopernika w Toruniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema Szyński</h2>
+          <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths}
+                     setShowPaths={setShowPaths} setQuadrants={setQuadrants}/>
+          <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing}
+               showPaths={showPaths}/>
+
+          <h3> Uniwersytet Mikołaja Kopernika w Toruniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema
+              Szyński</h3>
           <div>
               <a href="https://vite.dev" target="_blank">
                   <img src={viteLogo} className="logo" alt="Vite logo"/>
@@ -32,9 +38,7 @@ function App() {
                   <img src={crowLogo} className="logo crow" alt="React logo"/>
               </a>
           </div>
-          <h2>Vite + React + Crow cpp</h2>
-          <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths} setShowPaths={setShowPaths} setQuadrants={setQuadrants} />
-          <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing} showPaths={showPaths}/>
+          <h5 style={{"margin": 0}}>Vite + React + Crow cpp</h5>
       </>
   )
 }

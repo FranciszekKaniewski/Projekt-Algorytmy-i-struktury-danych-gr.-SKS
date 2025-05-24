@@ -11,11 +11,18 @@ type Props = {
 
 export const Pin = ({id,position,type,production,limit,fromId,toId}:Props) => (
     <div className="pin">
-        <h4>{type} id:{id}</h4>
-
-        {position ? <h5>Pozycja (x: {position.x}, y:{position.y})</h5> :
-            <h5>Z id:{fromId} do id:{toId}</h5>}
-        {production ? <h3>production: {production}</h3> : null}
-        {limit ? <h3>limit: {limit}</h3> : null}
+        <h3>
+            {type === "inn" ? "Karczma" :
+                type === "cross" ? "Skrzyżowanie" :
+                    type === "field" ? "Pole" :
+                        type === "egde" ? "Droga" :
+                            type === "brewery" ? "Browar" : null
+            }
+            (id:{id}) |
+            {position ? ` pozycja: (x: ${position.x}, y:${position.y}) |`:null}
+            {(fromId || fromId===0) && (toId || toId===0) ? ` trasa: id:${fromId} --> id:${toId} |`:null}
+            {production ? ` produkcja: ${production} |` : null}
+            {limit ? ` limit: ${limit} |` : null}
+        </h3>
     </div>
 )
