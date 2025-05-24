@@ -43,6 +43,9 @@ void Router::setupRoutes() {
                         if (!body)
                             return crow::response(400, "Invalid JSON");
 
+                        if(!this->mapQuadrants.quadrants.size())
+                            return crow::response(400, "Quadrants aren't added!");
+
                         int i=0;
                         for (const auto& item : body) {
                             if (!item.has("type") || !item.has("position") || !item["position"].has("x") || !item["position"].has("y")) {
@@ -269,8 +272,8 @@ void Router::setupRoutes() {
                                     return crow::response(400, "Each point must be an array of two numbers");
                                 }
 
-                                float x = static_cast<float>(p[0].d());
-                                float y = static_cast<float>(p[1].d());
+                                float x = static_cast<float>(p["x"].d());
+                                float y = static_cast<float>(p["y"].d());
                                 points.push_back(Point{x, y});
                             }
 
