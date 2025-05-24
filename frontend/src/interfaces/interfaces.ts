@@ -27,3 +27,8 @@ export interface Path{
 export interface jsonDataFromFile {
     Vertex: Vertex[];
 }
+
+export interface Quadrant {
+    production: number;
+    points: {x: number; y: number}[];
+}

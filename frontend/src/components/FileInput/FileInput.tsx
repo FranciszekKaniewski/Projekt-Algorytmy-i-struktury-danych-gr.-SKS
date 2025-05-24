@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState,} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Cross, Edge, Field, Vertex, Path} from "../../interfaces/interfaces.ts";
+import {Cross, Edge, Field, Vertex, Path, Quadrant} from "../../interfaces/interfaces.ts";
 import './FileInput.css'
 
 type Props = {
@@ -9,11 +9,13 @@ type Props = {
     setPathing: (data:Path[]) => void;
     showPaths: "barley"|"beer"|null;
     setShowPaths: (data:"barley"|"beer"|null) => void;
+    setQuadrants: (data:Quadrant[]) => void;
 }
 
-export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPaths}:Props) => {
+export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPaths, setQuadrants}:Props) => {
     const [jsonVertexData, setJsonVertexData] = useState<Vertex[]>([]);
     const [jsonEdgesData, setJsonEdgesData] = useState<Edge[]>([]);
+    const [jsonQuadrantsData, setJsonQuadrantsData] = useState<Quadrant[]>([]);
     const [messages, setMessages] = useState<string[]>([]);
 
     const file = useRef<HTMLInputElement>(null);
@@ -27,6 +29,9 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
 
         const resE = await Fetch('/api/edges',"GET") as string;
         setEdges(JSON.parse(resE));
+
+        const resQ = await Fetch('/api/quadrants',"GET") as string;
+        setQuadrants(JSON.parse(resQ));
     },[setEdges, setVertices])
 
     useEffect(() => {
@@ -38,6 +43,10 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
     },[fetchData, setEdges, setVertices]);
 
     const sendHandler = async () => {
+
+        const res3 = await Fetch("/api/quadrants","POST",jsonQuadrantsData as Quadrant[]);
+        setMessages(prevState => [...prevState, res3 as string]);
+
         if(!jsonVertexData.length && !jsonEdgesData.length) return
         const res = await Fetch("/api/vertices","POST",jsonVertexData as Vertex[]);
         setMessages(prevState => [...prevState, res as string]);
@@ -47,6 +56,7 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
 
         setJsonVertexData([]);
         setJsonEdgesData([]);
+        setJsonQuadrantsData([]);
         if(file.current){
             file.current.value = "";
         }
@@ -82,7 +92,43 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                 else if(e[0] === "E") {
                     setJsonEdgesData(prevState => [...prevState, {fromId: e[1], toId: e[2]}] as Edge[]);
                 }
+                else if(e[0] === "Q") {
+                    const production = Number(e[e.length - 1]);
+                    const points:{x:number, y:number}[] = [];
+
+                    let px = 0;
+                    let x = true;
+                    for (const string of e.slice(1, -1)) {
+                        if(x) px = Number(string);
+                        else {
+                            const py = Number(string);
+                            points.push({ x: px, y: py });
+                        }
+                        x = !x;
+                    }
+                    setJsonQuadrantsData(prevState => [...prevState, {points,production}] as Quadrant[]);
+                }
             })
+
+            if(jsonVertexData.length < 4){
+                const defaultQuadrants = [
+                        {
+                            "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": 1000.0, "x": 1000.0}, {"y": 1000.0, "x": 0.0}],
+                            "production": 100.0},
+                        {
+                            "points": [{"x": 0.0, "y": 0.0}, {"y": 0.0, "x": -1000.0}, {"x": -1000.0, "y": 1000.0}, {"x": 0.0, "y": 1000.0}],
+                            "production": 100.0
+                        },
+                        {
+                            "points": [{"y": 0.0, "x": 0.0}, {"x": -1000.0, "y": 0.0}, {"y": -1000.0, "x": -1000.0}, {"y": -1000.0, "x": 0.0}],
+                            "production": 100.0},
+                        {
+                            "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": -1000.0, "x": 1000.0}, {"y": -1000.0, "x": 0.0}],
+                            "production": 100.0
+                        }
+                ]
+                setJsonQuadrantsData(defaultQuadrants);
+            }
         };
         reader.readAsText(f);
 
@@ -95,6 +141,7 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
         setVertices([]);
         setEdges([]);
         setPathing([]);
+        setQuadrants([]);
         setShowPaths(null);
         if(file.current){
             file.current.value = "";

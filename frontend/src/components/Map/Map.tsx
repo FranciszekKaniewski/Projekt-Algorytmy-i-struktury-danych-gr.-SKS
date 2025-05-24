@@ -1,6 +1,6 @@
 import {useRef, useState} from "react";
 import {Canvas} from "../Canvas/Canvas.tsx";
-import {Cross, Edge, Field, Path, Vertex} from "../../interfaces/interfaces.ts";
+import {Cross, Edge, Field, Path, Quadrant, Vertex} from "../../interfaces/interfaces.ts";
 import {Stage, Layer, Rect, Circle, Line, Text, Arrow} from "react-konva";
 import {KonvaEventObject} from "konva/lib/Node";
 import {Pin} from "../Pin/Pin.tsx";
@@ -11,10 +11,11 @@ type Props = {
     vertices:Vertex[];
     edges: Edge[];
     pathing: Path[];
+    quadrants: Quadrant[];
     showPaths: "barley"|"beer"|null;
 }
 
-export const Map = ({vertices,edges,pathing,showPaths}:Props) => {
+export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
 
     //States
     const [isDragging, setIsDragging] = useState(false);
@@ -122,6 +123,20 @@ export const Map = ({vertices,edges,pathing,showPaths}:Props) => {
         />
     })
 
+    const drawQ = quadrants.map((q, index) => {
+        const pointsArray = q.points.flatMap(p => [p.x, p.y]);
+        return (
+            <Line
+                key={"q" + index}
+                points={pointsArray}
+                closed={true}
+                fill="rgba(150, 255, 100, 0.3)"
+                stroke="rgba(20, 150, 20, 1)"
+                strokeWidth={2}
+            />
+        );
+    });
+
     const drawPathing = pathing.filter(e => showPaths === e.transports).map((e,i) => {
         const vFrom = vertices.filter(v => v.id == e.fromId)[0];
         const vTo = vertices.filter(v => v.id == e.toId)[0];
@@ -180,6 +195,7 @@ export const Map = ({vertices,edges,pathing,showPaths}:Props) => {
                 >
                     <Layer scale={{ x: scale, y: scale }} offset={{ x: -mapPos.x/scale, y: -mapPos.y/scale }}>
                     <Circle radius={6} x={0} y={0} fill='red' />
+                        {drawQ}
                         {drawE}
                         {drawV}
                         {drawPathing}

@@ -5,12 +5,14 @@ import './App.css'
 import {useState} from "react";
 import {FileInput} from "./components/FileInput/FileInput.tsx";
 import {Map} from "./components/Map/Map.tsx";
-import {Edge, Path, Vertex} from "./interfaces/interfaces.ts";
+import {Edge, Path, Quadrant, Vertex} from "./interfaces/interfaces.ts";
 
 function App() {
 
     const [vertices, setVertices] = useState<Vertex[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
+
+    const [quadrants, setQuadrants] = useState<Quadrant[]>();
 
     const [pathing, setPathing] = useState<Path[]>([]);
     const [showPaths, setShowPaths] = useState<"barley"|"beer"|null>(null);
@@ -31,8 +33,8 @@ function App() {
               </a>
           </div>
           <h2>Vite + React + Crow cpp</h2>
-          <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths} setShowPaths={setShowPaths} />
-          <Map vertices={vertices ?? []} edges={edges ?? []} pathing={pathing} showPaths={showPaths}/>
+          <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths} setShowPaths={setShowPaths} setQuadrants={setQuadrants} />
+          <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing} showPaths={showPaths}/>
       </>
   )
 }
