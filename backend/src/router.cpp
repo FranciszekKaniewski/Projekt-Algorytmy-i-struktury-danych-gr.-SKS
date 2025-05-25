@@ -43,7 +43,7 @@ void Router::setupRoutes() {
                         if (!body)
                             return crow::response(400, "Invalid JSON");
 
-                        if(!this->mapQuadrants.quadrants.size())
+                        if(this->mapQuadrants.quadrants.size() != 4)
                             return crow::response(400, "Quadrants aren't added!");
 
                         int i=0;
@@ -57,6 +57,7 @@ void Router::setupRoutes() {
                                 case 'F': {
                                     v = new Field(item["position"]["x"].d(), item["position"]["y"].d(), item["production"].d());
                                     Field* f = dynamic_cast<Field*>(v);
+                                    if(this->mapQuadrants.getQuadrantOfField(f) == -1) break;
                                     f->production = mapQuadrants.quadrants[this->mapQuadrants.getQuadrantOfField(f)]->assignedProduction;
                                     break; }
                                 case 'B':

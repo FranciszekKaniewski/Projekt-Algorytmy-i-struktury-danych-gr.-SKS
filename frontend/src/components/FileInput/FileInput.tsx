@@ -44,8 +44,32 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
 
     const sendHandler = async () => {
 
-        const res3 = await Fetch("/api/quadrants","POST",jsonQuadrantsData as Quadrant[]);
-        setMessages(prevState => [...prevState, res3 as string]);
+        console.log(jsonQuadrantsData);
+        if(jsonQuadrantsData.length < 4){
+            const defaultQuadrants = [
+                {
+                    "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": 1000.0, "x": 1000.0}, {"y": 1000.0, "x": 0.0}],
+                    "production": 100.0},
+                {
+                    "points": [{"x": 0.0, "y": 0.0}, {"y": 0.0, "x": -1000.0}, {"x": -1000.0, "y": 1000.0}, {"x": 0.0, "y": 1000.0}],
+                    "production": 100.0
+                },
+                {
+                    "points": [{"y": 0.0, "x": 0.0}, {"x": -1000.0, "y": 0.0}, {"y": -1000.0, "x": -1000.0}, {"y": -1000.0, "x": 0.0}],
+                    "production": 100.0},
+                {
+                    "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": -1000.0, "x": 1000.0}, {"y": -1000.0, "x": 0.0}],
+                    "production": 100.0
+                }
+            ]
+            setJsonQuadrantsData(defaultQuadrants);
+
+            const res3 = await Fetch("/api/quadrants","POST",defaultQuadrants as Quadrant[]);
+            setMessages(prevState => [...prevState, res3 as string]);
+        }else{
+            const res3 = await Fetch("/api/quadrants","POST",jsonQuadrantsData as Quadrant[]);
+            setMessages(prevState => [...prevState, res3 as string]);
+        }
 
         if(!jsonVertexData.length && !jsonEdgesData.length) return
         const res = await Fetch("/api/vertices","POST",jsonVertexData as Vertex[]);
@@ -109,26 +133,6 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                     setJsonQuadrantsData(prevState => [...prevState, {points,production}] as Quadrant[]);
                 }
             })
-
-            if(jsonVertexData.length < 4){
-                const defaultQuadrants = [
-                        {
-                            "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": 1000.0, "x": 1000.0}, {"y": 1000.0, "x": 0.0}],
-                            "production": 100.0},
-                        {
-                            "points": [{"x": 0.0, "y": 0.0}, {"y": 0.0, "x": -1000.0}, {"x": -1000.0, "y": 1000.0}, {"x": 0.0, "y": 1000.0}],
-                            "production": 100.0
-                        },
-                        {
-                            "points": [{"y": 0.0, "x": 0.0}, {"x": -1000.0, "y": 0.0}, {"y": -1000.0, "x": -1000.0}, {"y": -1000.0, "x": 0.0}],
-                            "production": 100.0},
-                        {
-                            "points": [{"y": 0.0, "x": 0.0}, {"x": 1000.0, "y": 0.0}, {"y": -1000.0, "x": 1000.0}, {"y": -1000.0, "x": 0.0}],
-                            "production": 100.0
-                        }
-                ]
-                setJsonQuadrantsData(defaultQuadrants);
-            }
         };
         reader.readAsText(f);
 
