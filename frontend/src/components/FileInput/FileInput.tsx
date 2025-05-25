@@ -10,13 +10,19 @@ type Props = {
     showPaths: "barley"|"beer"|null;
     setShowPaths: (data:"barley"|"beer"|null) => void;
     setQuadrants: (data:Quadrant[]) => void;
+    areData: boolean;
 }
 
-export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPaths, setQuadrants}:Props) => {
+export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPaths, setQuadrants, areData}:Props) => {
     const [jsonVertexData, setJsonVertexData] = useState<Vertex[]>([]);
     const [jsonEdgesData, setJsonEdgesData] = useState<Edge[]>([]);
     const [jsonQuadrantsData, setJsonQuadrantsData] = useState<Quadrant[]>([]);
     const [messages, setMessages] = useState<string[]>([]);
+
+    const [maxFlow, setMaxFlow] = useState({barley:0,beer:0});
+
+    const [maxFlowOutFile, setMaxFlowOutFile] = useState<string>('text');
+    const [showRawData, setShowRawData] = useState(false);
 
     const file = useRef<HTMLInputElement>(null);
     const [fileName, setFileName] = useState("");
@@ -89,6 +95,52 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
         await fetchData();
     }
 
+    const parseFileContent = (text: string) => {
+        setJsonVertexData([]);
+        setJsonEdgesData([]);
+        setJsonQuadrantsData([]);
+
+        const linesArr = text.split("\n");
+        const wordsArr = linesArr
+            .map(l => l.trim())
+            .filter(l => l.length > 0)
+            .map(l => l.split(" "));
+
+        wordsArr.forEach(e => {
+            if (e[0] === "F")
+                setJsonVertexData(pS => (
+                    [...pS, ({ type: e[0], production: Number(e[3] ?? 0), position: { x: Number(e[1]), y: Number(e[2]) } } as Field)]
+                ))
+            else if (e[0] === "C")
+                setJsonVertexData(pS => (
+                    [...pS, ({ type: e[0], limit: Number(e[3] ?? 0), position: { x: Number(e[1]), y: Number(e[2]) } } as Cross)]
+                ))
+            else if (e[0] === "B" || e[0] === "I")
+                setJsonVertexData(pS => (
+                    [...pS, ({ type: e[0], position: { x: Number(e[1]), y: Number(e[2]) } } as Vertex)]
+                ))
+            else if (e[0] === "E") {
+                setJsonEdgesData(prevState => [...prevState, { fromId: e[1], toId: e[2] }] as Edge[]);
+            }
+            else if (e[0] === "Q") {
+                const production = Number(e[e.length - 1]);
+                const points: { x: number, y: number }[] = [];
+
+                let px = 0;
+                let x = true;
+                for (const string of e.slice(1, -1)) {
+                    if (x) px = Number(string);
+                    else {
+                        const py = Number(string);
+                        points.push({ x: px, y: py });
+                    }
+                    x = !x;
+                }
+                setJsonQuadrantsData(prevState => [...prevState, { points, production }] as Quadrant[]);
+            }
+        });
+    };
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const f = event.target.files?.[0];
         if (!f) return;
@@ -97,47 +149,21 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
         const reader = new FileReader();
         reader.onload = (e) => {
             const text = e.target?.result as string;
-            const linesArr = text.split("\n");
-            const wordsArr = linesArr.map( l => l.split(" "))
-
-            wordsArr.forEach(e=> {
-                if(e[0] === "F")
-                    setJsonVertexData(pS => (
-                        [...pS, ({type: e[0], production: Number(e[3] ?? 0), position: {x: Number(e[1]),y: Number(e[2])}} as Field)]
-                    ))
-                else if(e[0] === "C")
-                    setJsonVertexData( pS => (
-                        [...pS, ({type: e[0], limit: Number(e[3] ?? 0), position: {x: Number(e[1]),y: Number(e[2])}} as Cross)]
-                    ))
-                else if(e[0] === "B" || e[0] === "I")
-                    setJsonVertexData( pS => (
-                        [...pS, ({type: e[0], position: {x: Number(e[1]),y: Number(e[2])}} as Vertex)]
-                    ))
-                else if(e[0] === "E") {
-                    setJsonEdgesData(prevState => [...prevState, {fromId: e[1], toId: e[2]}] as Edge[]);
-                }
-                else if(e[0] === "Q") {
-                    const production = Number(e[e.length - 1]);
-                    const points:{x:number, y:number}[] = [];
-
-                    let px = 0;
-                    let x = true;
-                    for (const string of e.slice(1, -1)) {
-                        if(x) px = Number(string);
-                        else {
-                            const py = Number(string);
-                            points.push({ x: px, y: py });
-                        }
-                        x = !x;
-                    }
-                    setJsonQuadrantsData(prevState => [...prevState, {points,production}] as Quadrant[]);
-                }
-            })
+            parseFileContent(text);
         };
         reader.readAsText(f);
+    };
 
-        setJsonVertexData([]);
-        setJsonEdgesData([]);
+    const loadExampleFile = async (name: string) => {
+        try {
+            const res = await fetch(name);
+            const text = await res.text();
+            setFileName(name);
+            parseFileContent(text);
+        } catch (err) {
+            console.error("Błąd wczytywania pliku:", err);
+            setMessages(prev => [...prev, "Nie udało się wczytać pliku plik1.txt"]);
+        }
     };
 
     const deleteHandler = async () => {
@@ -165,18 +191,63 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
 
         const res = await Fetch('/api/max-flow',"POST") as string;
 
-        const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => !("maxBeerFlow" in e) && !("maxBarleyFlow" in e));
+        const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => {
+            if(!("maxBeerFlow" in e) && !("maxBarleyFlow" in e)) return true;
+            else{
+                if("maxBeerFlow" in e)
+                    setMaxFlow(prevState => ({barley: prevState.barley, beer: e.maxBeerFlow}))
+                else
+                    setMaxFlow(prevState => ({barley: e.maxBarleyFlow, beer: prevState.beer}));
+            }
+        });
 
         setShowPaths("barley");
         setPathing(paths);
+
+        if (!JSON.parse(res)) return;
+
+        let text = "=== Max Flow Result ===\n\n";
+        let textPaths = "";
+
+        let pathCount = 1;
+
+        JSON.parse(res).forEach((entry:Path|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => {
+            if ("maxBeerFlow" in entry) {
+                text += `Maksymalny przepływ piwa: ${entry.maxBeerFlow} 🍺\n\n`;
+            } else if ("maxBarleyFlow" in entry) {
+                text += `Maksymalny przepływ jęczmienia: ${entry.maxBarleyFlow} 🌾\n\n`;
+            } else {
+                textPaths += `Ścieżka ${pathCount++}: Przewieź ${entry.amount} ${entry.transports === "beer" ? "Piwa" : "Jęczmienia"} z punktu ${entry.fromId} do ${entry.toId} \n`;
+            }
+        });
+
+        text += textPaths;
+        setMaxFlowOutFile(text);
     }
+
+    const downloadFile = () => {
+        const blob = new Blob([maxFlowOutFile], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "maxflow_result.txt";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    };
+
+    const toggleRawData = () => {
+        setShowRawData(prev => !prev);
+    };
 
     return (
         <div className="p-4 flex flex-col items-center">
             <span>Test files: </span>
-            <a href="/test-file-1.txt" target="_blank"> plik_1</a> |
-            <a href="/test-file-2.txt" target="_blank"> plik_2</a> |
-            <a href="/test-file-3.txt" target="_blank"> plik_3</a>
+            <a href="/test-file-1.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-1.txt")}> plik_1</a> |
+            <a href="/test-file-2.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-2.txt")}> plik_2</a> |
+            <a href="/test-file-3.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-3.txt")}> plik_3</a>
+
             <div style={fileName.length ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
                  className="dropzone">
                 <input
@@ -191,15 +262,32 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                     disabled={!jsonVertexData.length && !jsonEdgesData.length}>
                 Wyślij na backend
             </button>
-            <button onClick={() => deleteHandler()} className="mt-4 p-2 bg-blue-500 text-white rounded">
+            <button
+                onClick={() => deleteHandler()}
+                disabled={areData}
+            >
                 Wyczyść dane
             </button>
-            {messages.map((m, i) => <p key={i}>{m}</p>)}
+            <br/>
             <button
                 className='refresh-btn'
                 onClick={maxFlowHandler}>
-                {showPaths === null ? "Oblicz MaxFlow" : showPaths === "barley" ? "Pokaż scieszki dla piwa" : "Pokaż scieszki dla jęczmienia"}
+                {showPaths === null ? "Oblicz MaxFlow" : showPaths === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
             </button>
+            {showPaths === "barley" ? <h3>Maksymalny przepływ jęczmienia do browarów wynosi: {maxFlow.barley} 🌾</h3> :
+                showPaths === "beer" ? <h3>Maksymalny przepływ piwa do karczm wynosi: {maxFlow.beer} 🍺</h3> : null
+            }
+            {showPaths !== null &&
+                <div className="mt-4 flex gap-4">
+                    <button
+                        onClick={downloadFile}>Pobierz plik transportu
+                    </button>
+                    <button
+                        onClick={toggleRawData}>{showRawData ? "Ukryj plik transportu" : "Pokaż plik transportu"}</button>
+                </div>
+            }
+
+            {showRawData && <textarea value={maxFlowOutFile}></textarea>}
         </div>
     )
 }

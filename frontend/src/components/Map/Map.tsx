@@ -152,18 +152,10 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
                     fontSize={12/scale}
                     fontFamily={'Calibri'}
                 />
-                <Text
-                    x={(vFrom.position.x+vTo.position.x)/2 - 20}
-                    y={(vFrom.position.y+vTo.position.y)/2}
-                    fill={'black'}
-                    text={e.amount.toFixed(2).toString()}
-                    fontSize={12/scale}
-                    fontFamily={'Calibri'}
-                />
                 <Arrow
                     key={"p"+i}
                     stroke={'red'}
-                    points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y-10]}
+                    points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y]}
                     pointerLength={20}
                     pointerWidth={20}
                     // onMouseEnter={() => showDetails(e)}
@@ -176,7 +168,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
     return(
         <>
             <h4 className="mouse-cordinats">
-                x: {(pointerPos.x - mapPos.x).toFixed(0)} y: {(pointerPos.y - mapPos.y).toFixed(0)}
+                x: {((pointerPos.x - mapPos.x)/scale).toFixed(0)} y: {((pointerPos.y - mapPos.y)/scale).toFixed(0)}
             </h4>
             <div>
                 <span> {scale} </span>

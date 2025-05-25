@@ -24,3 +24,10 @@
     font-size: 1.125rem;
     pointer-events: none;
 }
+
+textarea{
+    width: 800px;
+    height: 300px;
+    border-radius: 5px;
+    resize: none;
+}

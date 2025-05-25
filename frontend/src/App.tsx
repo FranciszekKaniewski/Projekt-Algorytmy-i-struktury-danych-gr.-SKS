@@ -21,7 +21,7 @@ function App() {
       <>
           <h1>Projek Algorytmy i Struktury danych</h1>
           <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths}
-                     setShowPaths={setShowPaths} setQuadrants={setQuadrants}/>
+                     setShowPaths={setShowPaths} setQuadrants={setQuadrants} areData={!(vertices.length || edges.length || quadrants?.length)}/>
           <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing}
                showPaths={showPaths}/>
 
