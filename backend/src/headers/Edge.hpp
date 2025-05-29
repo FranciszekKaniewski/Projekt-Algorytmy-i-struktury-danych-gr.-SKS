@@ -15,6 +15,7 @@ class Edge{
         int id;
         bool isBroken;
         double length;
+        double cost;
     };
 
 #endif // ROAD_HPP

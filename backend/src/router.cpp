@@ -199,6 +199,56 @@ void Router::setupRoutes() {
                         return crow::response(os.str());
                     });
 
+    this->app_.route_dynamic(this->path+"/min-cost-max-flow")
+            .methods(crow::HTTPMethod::Get)
+                    ([this]() {
+                        this->maxFlowSolver = MaxFlowSolver(this->allVertices, this->allEdges);
+
+                        crow::json::wvalue response_json;
+                        response_json = crow::json::wvalue::list();
+                        int i = 0;
+
+                        this->maxFlowSolver.isBeerCreated = false;
+                        std::vector<std::tuple<int,int,float>> barley_used_edges;
+                        float barley_total_flow = 0;
+                        float min_cost_barley = this->maxFlowSolver.minCostMaxFlow(barley_used_edges, this->allVertices, barley_total_flow);
+
+                        crow::json::wvalue maxBarleyFlowInfo;
+                        maxBarleyFlowInfo["maxBarleyFlow"] = barley_total_flow;
+                        maxBarleyFlowInfo["minCostBarleyTransport"] = min_cost_barley;
+                        response_json[i++] = std::move(maxBarleyFlowInfo);
+
+                        for (auto& [u, v, f] : barley_used_edges) {
+                            crow::json::wvalue path;
+                            path["fromId"] = u;
+                            path["toId"] = v;
+                            path["amount"] = f;
+                            path["transports"] = "barley";
+                            response_json[i++] = std::move(path);
+                        }
+
+                        this->maxFlowSolver.isBeerCreated = true;
+                        std::vector<std::tuple<int,int,float>> beer_used_edges;
+                        float beer_total_flow = 0;
+                        float min_cost_beer = this->maxFlowSolver.minCostMaxFlow(beer_used_edges, this->allVertices, beer_total_flow);
+
+                        crow::json::wvalue maxBeerFlowInfo;
+                        maxBeerFlowInfo["maxBeerFlow"] = beer_total_flow;
+                        maxBeerFlowInfo["minCostBeerTransport"] = min_cost_beer;
+                        response_json[i++] = std::move(maxBeerFlowInfo);
+
+                        for (auto& [u, v, f] : beer_used_edges) {
+                            crow::json::wvalue path;
+                            path["fromId"] = u;
+                            path["toId"] = v;
+                            path["amount"] = f;
+                            path["transports"] = "beer";
+                            response_json[i++] = std::move(path);
+                        }
+
+                        return crow::response(response_json);
+                    });
+
     this->app_.route_dynamic(this->path+"/max-flow")
             .methods(crow::HTTPMethod::Post)
                     ([this]() {
