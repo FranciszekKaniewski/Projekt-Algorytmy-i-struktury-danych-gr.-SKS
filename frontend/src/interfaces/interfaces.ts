@@ -15,6 +15,7 @@ export interface Edge{
     id: number;
     fromId: number;
     toId: number;
+    cost: number;
 }
 
 export interface Path{

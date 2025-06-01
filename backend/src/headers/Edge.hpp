@@ -7,13 +7,12 @@ using namespace std;
 
 class Edge{
     public:
-        Edge(Vertex* start, Vertex* end, bool isBroken = false);
+        Edge(Vertex* start, Vertex* end, double cost = 0);
         Vertex* start;
         Vertex* end;
 
         static int freeId;
         int id;
-        bool isBroken;
         double length;
         double cost;
     };

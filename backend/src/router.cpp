@@ -139,8 +139,9 @@ void Router::setupRoutes() {
                             if (!v1 || !v2) {
                                 return crow::response(400, "Invalid vertex id");
                             }
+                            double cost = item["cost"].d();
 
-                            this->allEdges.push_back(new Edge(v1, v2));
+                            this->allEdges.push_back(new Edge(v1, v2,cost));
                             i++;
                         }
 
@@ -163,6 +164,7 @@ void Router::setupRoutes() {
                             edge["id"] = e->id;
                             edge["fromId"] = e->start->id;
                             edge["toId"] = e->end->id;
+                            edge["cost"] = e->cost;
 
                             vertices_json[i++] = std::move(edge);
                         }

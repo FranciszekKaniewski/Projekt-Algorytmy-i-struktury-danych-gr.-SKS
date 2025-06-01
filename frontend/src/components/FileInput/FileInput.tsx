@@ -120,7 +120,8 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                     [...pS, ({ type: e[0], position: { x: Number(e[1]), y: Number(e[2]) } } as Vertex)]
                 ))
             else if (e[0] === "E") {
-                setJsonEdgesData(prevState => [...prevState, { fromId: e[1], toId: e[2] }] as Edge[]);
+                setJsonEdgesData(prevState => [...prevState, { fromId: e[1], toId: e[2], cost: e[3] ? Number(e[3]) : 0 }] as Edge[]);
+                console.log([{ fromId: e[1], toId: e[2], cost: e[3] ? Number(e[3]) : 0 }]);
             }
             else if (e[0] === "Q") {
                 const production = Number(e[e.length - 1]);
