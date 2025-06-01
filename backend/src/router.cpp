@@ -2,6 +2,7 @@
 #include "./headers/vertex.hpp"
 #include "./headers/maxFlowSolver.hpp"
 #include "./headers/mapQuadrants.hpp"
+#include "./headers/TEKT-Robota.hpp"
 #include <initializer_list>
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
@@ -364,4 +365,22 @@ void Router::setupRoutes() {
 
                         return crow::response(vertices_json);
                     });
+
+       this->app_.route_dynamic(this->path+"/KMP")
+            .methods(crow::HTTPMethod::Get)
+                    ([this]() {
+                        string tekst = "Ala ma kota\nKot ma Ale\nAla ma malego kota.\n kota ma ala";
+                        string patern = "kota";
+
+                        KMPSolver rob(tekst, patern);
+                        vector<KMPAns> wyniki = rob.KMP();
+
+                        for (const auto& wynik : wyniki) {
+                             cout << "Linia " << wynik.row << ": \"" << wynik.lineText << "\"\n"
+                                 << " Indeks: " << wynik.column
+                                << ", Dlugosc: " << wynik.length << endl << endl;
+                        }
+
+                            return "OK";
+                        });
 }
