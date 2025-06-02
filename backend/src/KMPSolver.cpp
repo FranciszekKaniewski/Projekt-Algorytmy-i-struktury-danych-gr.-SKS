@@ -1,4 +1,4 @@
-#include "./headers/TEKT-Robota.hpp"
+#include "./headers/KMPSolver.hpp"
 
 
 vector<KMPAns> KMPSolver::KMP() {

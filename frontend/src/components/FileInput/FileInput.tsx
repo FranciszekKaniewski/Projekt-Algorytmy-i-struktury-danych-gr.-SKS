@@ -1,14 +1,14 @@
 import React, {useCallback, useEffect, useRef, useState,} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
-import {Cross, Edge, Field, Vertex, Path, Quadrant} from "../../interfaces/interfaces.ts";
+import {Cross, Edge, Field, Vertex, Path, Quadrant, Pathing} from "../../interfaces/interfaces.ts";
 import './FileInput.css'
 
 type Props = {
     setVertices: (data:Vertex[])=> void;
     setEdges: (data:Edge[]) => void;
     setPathing: (data:Path[]) => void;
-    showPaths: "barley"|"beer"|null;
-    setShowPaths: (data:"barley"|"beer"|null) => void;
+    showPaths: Pathing;
+    setShowPaths: (arg0: Pathing) => void;
     setQuadrants: (data:Quadrant[]) => void;
     areData: boolean;
 }
@@ -50,7 +50,6 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
 
     const sendHandler = async () => {
 
-        console.log(jsonQuadrantsData);
         if(jsonQuadrantsData.length < 4){
             const defaultQuadrants = [
                 {
@@ -121,7 +120,6 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                 ))
             else if (e[0] === "E") {
                 setJsonEdgesData(prevState => [...prevState, { fromId: e[1], toId: e[2], cost: e[3] ? Number(e[3]) : 0 }] as Edge[]);
-                console.log([{ fromId: e[1], toId: e[2], cost: e[3] ? Number(e[3]) : 0 }]);
             }
             else if (e[0] === "Q") {
                 const production = Number(e[e.length - 1]);
@@ -181,16 +179,16 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
         setMessages([res as string]);
     }
 
-    const maxFlowHandler = async () => {
-        if(showPaths === "barley"){
-            setShowPaths("beer");
+    const maxFlowHandler = async (costs: boolean) => {
+        if(showPaths?.type === "barley"){
+            setShowPaths({type: "beer", costs});
             return;
-        }else if(showPaths === "beer"){
-            setShowPaths("barley");
+        }else if(showPaths?.type === "beer"){
+            setShowPaths({type: "barley", costs});
             return;
         }
 
-        const res = await Fetch('/api/max-flow',"POST") as string;
+        const res = await Fetch(!costs ? '/api/max-flow' : '/api/min-cost-max-flow',"GET") as string;
 
         const paths = JSON.parse(res).filter((e:Path[]|{"maxBeerFlow": number}|{"maxBarleyFlow": number}) => {
             if(!("maxBeerFlow" in e) && !("maxBarleyFlow" in e)) return true;
@@ -202,7 +200,7 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
             }
         });
 
-        setShowPaths("barley");
+        setShowPaths({type: "barley", costs});
         setPathing(paths);
 
         if (!JSON.parse(res)) return;
@@ -219,6 +217,12 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                 text += `Maksymalny przepływ jęczmienia: ${entry.maxBarleyFlow} 🌾\n\n`;
             } else {
                 textPaths += `Ścieżka ${pathCount++}: Przewieź ${entry.amount} ${entry.transports === "beer" ? "Piwa" : "Jęczmienia"} z punktu ${entry.fromId} do ${entry.toId} \n`;
+            }
+
+            if ("minCostBarleyTransport" in entry) {
+                text += `Minimalny koszt naprawy scierzek dla przewozu jęczmienia: ${entry.minCostBarleyTransport} 🌾\n\n`;
+            }else if ("minCostBeerTransport" in entry) {
+                text += `Minimalny koszt naprawy scierzek dla przewozu piwa: ${entry.minCostBeerTransport} 🍺\n\n`;
             }
         });
 
@@ -245,9 +249,9 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
     return (
         <div className="p-4 flex flex-col items-center">
             <span>Test files: </span>
-            <a href="/test-file-1.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-1.txt")}> plik_1</a> |
-            <a href="/test-file-2.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-2.txt")}> plik_2</a> |
-            <a href="/test-file-3.txt" target="_blank" onClick={()=>loadExampleFile("/test-file-3.txt")}> plik_3</a>
+            <a href="/test-file-1.txt" target="_blank" onClick={() => loadExampleFile("/test-file-1.txt")}> plik_1</a> |
+            <a href="/test-file-2.txt" target="_blank" onClick={() => loadExampleFile("/test-file-2.txt")}> plik_2</a> |
+            <a href="/test-file-3.txt" target="_blank" onClick={() => loadExampleFile("/test-file-3.txt")}> plik_3</a>
 
             <div style={fileName.length ? {backgroundColor: "#aaeeaa"} : {backgroundColor: "#fefefe"}}
                  className="dropzone">
@@ -270,13 +274,25 @@ export const FileInput = ({setVertices,setEdges,setPathing,showPaths,setShowPath
                 Wyczyść dane
             </button>
             <br/>
-            <button
+            {showPaths?.costs !== true ? <button
                 className='refresh-btn'
-                onClick={maxFlowHandler}>
-                {showPaths === null ? "Oblicz MaxFlow" : showPaths === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
-            </button>
-            {showPaths === "barley" ? <h3>Maksymalny przepływ jęczmienia do browarów wynosi: {maxFlow.barley} 🌾</h3> :
-                showPaths === "beer" ? <h3>Maksymalny przepływ piwa do karczm wynosi: {maxFlow.beer} 🍺</h3> : null
+                onClick={() => maxFlowHandler(false)}>
+                {showPaths === null ? "Oblicz MaxFlow" : showPaths.type === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
+            </button> : null}
+            {showPaths?.costs !== false ? <button
+                className='refresh-btn'
+                onClick={() => maxFlowHandler(true)}>
+                {showPaths === null ? "Oblicz MaxFlow z min. kosztami" : showPaths.type === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
+            </button> : null}
+            {showPaths !== null ?
+                <button
+                    className='refresh-btn'
+                    onClick={() => setShowPaths(null)}>
+                    ❌
+                </button> : null
+            }
+            {showPaths?.type === "barley" ? <h3>Maksymalny przepływ jęczmienia do browarów wynosi: {maxFlow.barley} 🌾</h3> :
+                showPaths?.type === "beer" ? <h3>Maksymalny przepływ piwa do karczm wynosi: {maxFlow.beer} 🍺</h3> : null
             }
             {showPaths !== null &&
                 <div className="mt-4 flex gap-4">

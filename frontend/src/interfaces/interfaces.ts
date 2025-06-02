@@ -33,3 +33,5 @@ export interface Quadrant {
     production: number;
     points: {x: number; y: number}[];
 }
+
+export type Pathing = {type:"barley"|"beer", costs: boolean} | null

@@ -5,7 +5,7 @@ import './App.css'
 import {useState} from "react";
 import {FileInput} from "./components/FileInput/FileInput.tsx";
 import {Map} from "./components/Map/Map.tsx";
-import {Edge, Path, Quadrant, Vertex} from "./interfaces/interfaces.ts";
+import {Edge, Path, Pathing, Quadrant, Vertex} from "./interfaces/interfaces.ts";
 
 function App() {
 
@@ -15,7 +15,7 @@ function App() {
     const [quadrants, setQuadrants] = useState<Quadrant[]>();
 
     const [pathing, setPathing] = useState<Path[]>([]);
-    const [showPaths, setShowPaths] = useState<"barley"|"beer"|null>(null);
+    const [showPaths, setShowPaths] = useState<Pathing>(null);
 
   return (
       <>

@@ -10,7 +10,5 @@ export const Fetch = async (url: string, method: Method, body?: any): Promise<Re
         body: JSON.stringify(body),
     })
 
-    console.log(res);
-
     return await res.text();
 }

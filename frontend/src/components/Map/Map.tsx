@@ -1,18 +1,19 @@
 import {useRef, useState} from "react";
 import {Canvas} from "../Canvas/Canvas.tsx";
-import {Cross, Edge, Field, Path, Quadrant, Vertex} from "../../interfaces/interfaces.ts";
+import {Cross, Edge, Field, Path, Pathing, Quadrant, Vertex} from "../../interfaces/interfaces.ts";
 import {Stage, Layer, Rect, Circle, Line, Text, Arrow} from "react-konva";
 import {KonvaEventObject} from "konva/lib/Node";
 import {Pin} from "../Pin/Pin.tsx";
 
 import "./map.css";
+import {ToFixed} from "../../utils/ToFixed.tsx";
 
 type Props = {
     vertices:Vertex[];
     edges: Edge[];
     pathing: Path[];
     quadrants: Quadrant[];
-    showPaths: "barley"|"beer"|null;
+    showPaths: Pathing;
 }
 
 export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
@@ -56,7 +57,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
 
     const showDetails = (e: Vertex|Field|Cross|Edge) => {
         if("fromId" in e){
-            setPin({id: e.id, fromId: e.fromId, toId: e.toId});
+            setPin({id: e.id, fromId: e.fromId, toId: e.toId, cost: e.cost});
         }
         else if ("limit" in e) {
             setPin({id: e.id, position: e.position, type: e.type, limit: e.limit});
@@ -138,28 +139,37 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
         );
     });
 
-    const drawPathing = pathing.filter(e => showPaths === e.transports).map((e,i) => {
+    const drawPathing = pathing.filter(e => showPaths?.type === e.transports).map((e,i) => {
         const vFrom = vertices.filter(v => v.id == e.fromId)[0];
         const vTo = vertices.filter(v => v.id == e.toId)[0];
+
+        let edge:Edge|null = null;
+        edge = edges.filter(e => e.fromId === e.fromId && e.toId === e.toId)[0];
+
+        let showCost = "";
+        if(showPaths?.costs === true) {
+            showCost = "/" + ToFixed(edge?.cost);
+        }
 
         return (
             <>
                 <Text
+                    key={"text"+i*100}
                     x={(vFrom.position.x+vTo.position.x)/2 - 20}
                     y={(vFrom.position.y+vTo.position.y)/2}
                     fill={'black'}
-                    text={e.amount.toFixed(2).toString()}
-                    fontSize={12/scale}
+                    text={ToFixed(e.amount).toString() + showCost}
+                    fontSize={12/scale*scale}
                     fontFamily={'Calibri'}
                 />
                 <Arrow
-                    key={"p"+i}
+                    key={"path"+i*100}
                     stroke={'red'}
                     points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y]}
                     pointerLength={20}
                     pointerWidth={20}
-                    // onMouseEnter={() => showDetails(e)}
-                    // onMouseLeave={() => hideDetails()}
+                    onMouseEnter={() => showDetails(edge)}
+                    onMouseLeave={() => hideDetails()}
                 />
             </>
         )
@@ -179,6 +189,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
             <div style={{ position: 'relative', width: 800, height: 800, margin: "auto" }}>
                 <Canvas draw={drawGrid} />
                 <Stage
+                    key={"s"+1}
                     width={800}
                     height={800}
                     onMouseDown={() => setIsDragging(true)}
@@ -202,6 +213,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
                     production={"production" in pin ? pin.production : null}
                     fromId={"fromId" in pin ? pin.fromId : null}
                     toId={"toId" in pin ? pin.toId : null}
+                    cost={"cost" in pin ? pin.cost : null}
                 /> : null}
             </div>
         </>

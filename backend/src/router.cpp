@@ -2,7 +2,7 @@
 #include "./headers/vertex.hpp"
 #include "./headers/maxFlowSolver.hpp"
 #include "./headers/mapQuadrants.hpp"
-#include "./headers/TEKT-Robota.hpp"
+#include "./headers/KMPSolver.hpp"
 #include <initializer_list>
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
@@ -253,7 +253,7 @@ void Router::setupRoutes() {
                     });
 
     this->app_.route_dynamic(this->path+"/max-flow")
-            .methods(crow::HTTPMethod::Post)
+            .methods(crow::HTTPMethod::Get)
                     ([this]() {
                         this->maxFlowSolver = MaxFlowSolver(this->allVertices, this->allEdges);
 

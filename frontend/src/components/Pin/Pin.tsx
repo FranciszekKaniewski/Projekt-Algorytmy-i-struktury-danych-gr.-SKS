@@ -7,9 +7,10 @@ type Props = {
     limit: number|null;
     fromId: number|null;
     toId: number|null;
+    cost: number|null;
 }
 
-export const Pin = ({id,position,type,production,limit,fromId,toId}:Props) => (
+export const Pin = ({id,position,type,production,limit,fromId,toId,cost}:Props) => (
     <div className="pin">
         <h3>
             {type === "inn" ? "Karczma" :
@@ -23,6 +24,7 @@ export const Pin = ({id,position,type,production,limit,fromId,toId}:Props) => (
             {(fromId || fromId===0) && (toId || toId===0) ? ` trasa: id:${fromId} --> id:${toId} |`:null}
             {production ? ` produkcja: ${production} |` : null}
             {limit ? ` limit: ${limit} |` : null}
+            {cost !== null ? ` koszt naprawy: ${cost} |` : null}
         </h3>
     </div>
 )
