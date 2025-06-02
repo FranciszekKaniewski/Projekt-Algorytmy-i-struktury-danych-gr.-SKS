@@ -367,20 +367,37 @@ void Router::setupRoutes() {
                     });
 
        this->app_.route_dynamic(this->path+"/KMP")
-            .methods(crow::HTTPMethod::Get)
-                    ([this]() {
-                        string tekst = "Ala ma kota\nKot ma Ale\nAla ma malego kota.\n kota ma ala";
-                        string patern = "kota";
-
-                        KMPSolver rob(tekst, patern);
-                        vector<KMPAns> wyniki = rob.KMP();
-
-                        for (const auto& wynik : wyniki) {
-                             cout << "Linia " << wynik.row << ": \"" << wynik.lineText << "\"\n"
-                                 << " Indeks: " << wynik.column
-                                << ", Dlugosc: " << wynik.length << endl << endl;
+            .methods(crow::HTTPMethod::Post)
+                    ([](const crow::request& req) {
+                        auto body = crow::json::load(req.body);
+                        if (!body) {
+                            return crow::response(400, "Invalid JSON");
+                        }
+                        if (!body[0].has("text") || !body[0].has("pattern") || body.size()>1) {
+                            return crow::response(400, "Allows only one item and item must have 'text' and 'pattern'");
                         }
 
-                            return "OK";
-                        });
+                        string tekst = body[0]["text"].s();
+                        string pattern = body[0]["pattern"].s();
+
+                        KMPSolver rob(tekst, pattern);
+                        vector<KMPAns> wyniki = rob.KMP();
+
+                        crow::json::wvalue vertices_json;
+                        vertices_json = crow::json::wvalue::list();
+
+                        int i = 0;
+                        for (const auto& wynik : wyniki) {
+                            crow::json::wvalue pattern;
+
+                            pattern["row"] = wynik.row;
+                            pattern["column"] = wynik.column;
+                            pattern["length"] = wynik.length;
+                            pattern["lineText"] = wynik.lineText;
+
+                            vertices_json[i++] = std::move(pattern);
+                        }
+
+                        return crow::response(200, vertices_json);
+                    });
 }

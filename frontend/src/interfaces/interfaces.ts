@@ -35,3 +35,10 @@ export interface Quadrant {
 }
 
 export type Pathing = {type:"barley"|"beer", costs: boolean} | null
+
+export interface KMPResponse {
+    lineText: string,
+    length: number,
+    column: number,
+    row: number
+}

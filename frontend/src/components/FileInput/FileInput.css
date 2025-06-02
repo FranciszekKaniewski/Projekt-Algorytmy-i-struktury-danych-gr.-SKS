@@ -25,9 +25,23 @@
     pointer-events: none;
 }
 
-textarea{
+.styled-output {
+    white-space: pre-wrap;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
     width: 800px;
     height: 300px;
-    border-radius: 5px;
-    resize: none;
+    margin: 0 auto;
+    text-align: left;
+    padding: 16px;
 }
+
+.styled-output .highlight {
+    background-color: yellow;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
