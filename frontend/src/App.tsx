@@ -23,7 +23,7 @@ function App() {
           <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths}
                      setShowPaths={setShowPaths} setQuadrants={setQuadrants} areData={!(vertices.length || edges.length || quadrants?.length)}/>
           <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing}
-               showPaths={showPaths}/>
+               showPaths={showPaths} setVertices={setVertices} setEdges={setEdges}/>
 
           <h3> Uniwersytet Mikołaja Kopernika w Toruniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema
               Szyński</h3>

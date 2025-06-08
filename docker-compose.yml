@@ -11,6 +11,21 @@ services:
     profiles:
       - test
 
+  frontend-build:
+    image: node:20
+    container_name: frontend-build
+    working_dir: /app
+    command: bash -c "npm install && npm run build && npm install -g serve && serve -s dist -l 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+    profiles:
+      - build
+
   backend:
     build: ./backend
     command: bash -c "make bar"

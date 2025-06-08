@@ -4,3 +4,8 @@
     height: 800px;
     border: 2px solid black;
 }
+
+canvas{
+    z-index: 1;
+    background-color: white;
+}

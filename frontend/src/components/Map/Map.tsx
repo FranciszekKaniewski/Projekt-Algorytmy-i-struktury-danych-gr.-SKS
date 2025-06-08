@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {Dispatch, SetStateAction, useRef, useState} from "react";
 import {Canvas} from "../Canvas/Canvas.tsx";
 import {Cross, Edge, Field, Path, Pathing, Quadrant, Vertex} from "../../interfaces/interfaces.ts";
 import {Stage, Layer, Rect, Circle, Line, Text, Arrow} from "react-konva";
@@ -7,6 +7,7 @@ import {Pin} from "../Pin/Pin.tsx";
 
 import "./map.css";
 import {ToFixed} from "../../utils/ToFixed.tsx";
+import {List} from "../List/List.tsx";
 
 type Props = {
     vertices:Vertex[];
@@ -14,9 +15,11 @@ type Props = {
     pathing: Path[];
     quadrants: Quadrant[];
     showPaths: Pathing;
+    setVertices: Dispatch<SetStateAction<Vertex[]>>;
+    setEdges: Dispatch<SetStateAction<Edge[]>>;
 }
 
-export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
+export const Map = ({vertices,edges,quadrants,pathing,showPaths,setVertices,setEdges}:Props) => {
 
     //States
     const [isDragging, setIsDragging] = useState(false);
@@ -106,7 +109,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
             height={20}
             x={v.position.x - 10}
             y={v.position.y - 10}
-            fill={v.type === 'field' ? 'green' : v.type === 'brewery' ? 'orange' : v.type === 'inn' ? 'red' : 'gray'}
+            fill={v.type.toUpperCase() === 'FIELD' ? 'green' : v.type.toUpperCase() === 'BREWERY' ? 'orange' : v.type.toUpperCase() === 'INN' ? 'red' : 'gray'}
             onMouseEnter={() => showDetails(v)}
             onMouseLeave={() => hideDetails()}
         />
@@ -118,7 +121,8 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
 
         return <Line
             key={"e"+e.id}
-            stroke={'grey'}
+            stroke={'#aaa'}
+            strokeWidth={15}
             points={[vFrom.position.x,vFrom.position.y,vTo.position.x,vTo.position.y]}
             onMouseEnter={() => showDetails(e)}
             onMouseLeave={() => hideDetails()}
@@ -144,11 +148,11 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
         const vTo = vertices.filter(v => v.id == e.toId)[0];
 
         let edge:Edge|null = null;
-        edge = edges.filter(e => e.fromId === e.fromId && e.toId === e.toId)[0];
+        edge = edges.filter(i => i.fromId === e.fromId && i.toId === e.toId)[0];
 
         let showCost = "";
         if(showPaths?.costs === true) {
-            showCost = "/" + ToFixed(edge?.cost);
+            showCost = "/" + ToFixed(edge ? edge?.cost : 0);
         }
 
         return (
@@ -186,7 +190,7 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
                 <button disabled={scale <= 0.125} onClick={() => setScale(prev => prev > 1 ? prev - 1 : prev / 2)}>-</button>
             </div>
 
-            <div style={{ position: 'relative', width: 800, height: 800, margin: "auto" }}>
+            <div style={{ position: 'relative', width: 800, height: 800, margin: "auto", backgroundColor: 'white' }}>
                 <Canvas draw={drawGrid} />
                 <Stage
                     key={"s"+1}
@@ -215,6 +219,8 @@ export const Map = ({vertices,edges,quadrants,pathing,showPaths}:Props) => {
                     toId={"toId" in pin ? pin.toId : null}
                     cost={"cost" in pin ? pin.cost : null}
                 /> : null}
+
+                <List vertices={vertices} edges={edges} setVertices={setVertices} setEdges={setEdges}/>
             </div>
         </>
     )

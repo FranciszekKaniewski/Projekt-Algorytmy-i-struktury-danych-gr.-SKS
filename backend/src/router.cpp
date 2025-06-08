@@ -36,6 +36,143 @@ void Router::setupRoutes() {
                         return crow::response{os.str()};
                     });
 
+    //Edit one Vertex
+    this->app_.route_dynamic(this->path+"/vertices/<int>")
+            .methods(crow::HTTPMethod::Patch)
+                    ([this](const crow::request& req, int id) {
+                        if(id >= this->allVertices.size() || id<0)
+                            return crow::response(400, "Invalid Id!");
+
+                        auto body = crow::json::load(req.body);
+                        if (!body || body.size() > 1)
+                            return crow::response(400, "Invalid JSON");
+
+                        const auto& item = body[0];
+                        if (!item.has("type") || !item.has("position") || !item["position"].has("x") || !item["position"].has("y")) {
+                            return crow::response(400, "Invalid item in list");
+                        }
+
+                        Vertex* v;
+                        switch(((std::string)item["type"].s())[0]){
+                            case 'f': {
+                                v = new Field(item["position"]["x"].d(), item["position"]["y"].d(), item["production"].d());
+                                Field* f = dynamic_cast<Field*>(v);
+                                if(this->mapQuadrants.getQuadrantOfField(f) == -1) break;
+                                f->production = mapQuadrants.quadrants[this->mapQuadrants.getQuadrantOfField(f)]->assignedProduction;
+                                break; }
+                            case 'b':
+                                v = new Brewery(item["position"]["x"].d(), item["position"]["y"].d());
+                                break;
+                            case 'c':
+                                v = new Cross(item["position"]["x"].d(), item["position"]["y"].d(), item["limit"].d());
+                                break;
+                            case 'i':
+                                v = new Inn(item["position"]["x"].d(), item["position"]["y"].d());
+                                break;
+                            default:
+                                v = new Vertex(item["position"]["x"].d(), item["position"]["y"].d());
+                        }
+                        v->id = id;
+                        Vertex::counter --;
+                        this->allVertices[id] = v;
+
+                        return crow::response(200, "Ok");
+                    });
+
+    //Delete one Vertex
+    this->app_.route_dynamic(this->path + "/vertices/<int>")
+            .methods({crow::HTTPMethod::Delete})
+                    ([this](int id) {
+                        if (id < 0 || id >= static_cast<int>(this->allVertices.size()))
+                            return crow::response(400, "Invalid Id!");
+
+                        int i=0;
+                        for (auto it = this->allEdges.begin(); it != this->allEdges.end(); ) {
+                            Edge* e = *it;
+                            if (e->start->id == id || e->end->id == id) {
+                                delete e;
+                                i++;
+                                it = this->allEdges.erase(it);
+                            } else {
+                                ++it;
+                            }
+                        }
+                        for(Edge* e : this->allEdges){
+                            e->id -= i;
+                        }
+
+                        for (auto it = this->allVertices.begin(); it != this->allVertices.end(); ) {
+                            Vertex* v = *it;
+                            if (v->id == id) {
+                                delete v;
+                                it = this->allVertices.erase(it);
+                            } else {
+                                ++it;
+                            }
+                        }
+                        for(Vertex* v : this->allVertices){
+                            if(v->id > id) v->id --;
+                        }
+                        Vertex::counter --;
+
+                        return crow::response(200, "Ok");
+                    });
+
+    //Delete one Edge
+    this->app_.route_dynamic(this->path + "/edges/<int>")
+            .methods({crow::HTTPMethod::Delete})
+                    ([this](int id) {
+                        if (id < 0 || id >= static_cast<int>(this->allEdges.size()))
+                            return crow::response(400, "Invalid Id!");
+
+                        for (auto it = this->allEdges.begin(); it != this->allEdges.end(); ) {
+                            Edge* e = *it;
+                            if (e->id == id) {
+                                delete e;
+                                it = this->allEdges.erase(it);
+                            } else {
+                                ++it;
+                            }
+                        }
+                        for(Edge* e : this->allEdges){
+                            if(e->id > id) e->id --;
+                        }
+                        Edge::freeId --;
+
+                        return crow::response(200, "Ok");
+                    });
+
+    //Edit one Edge
+    this->app_.route_dynamic(this->path + "/edges/<int>")
+            .methods({crow::HTTPMethod::Patch})
+                    ([this](const crow::request& req,int id) {
+                        if(id >= this->allEdges.size() || id<0)
+                            return crow::response(400, "Invalid Id!");
+
+                        auto body = crow::json::load(req.body);
+                        if (!body || body.size() > 1)
+                            return crow::response(400, "Invalid JSON");
+
+                        const auto& item = body[0];
+                        if (!item.has("fromId") || !item.has("toId") || item["toId"].i() == item["fromId"].i() ) {
+                            return crow::response(400, "Invalid item in list");
+                        }
+
+                        double cost = item.has("cost") ? item["cost"].d() : this->allEdges[id]->cost;
+                        delete this->allEdges[id];
+
+                        Vertex* fromV = this->allVertices[item["fromId"].i()];
+                        Vertex* toV = this->allVertices[item["toId"].i()];
+
+                        Edge* e = new Edge(fromV,toV,cost);
+                        e->id = id;
+                        Edge::freeId --;
+
+                        this->allEdges[id] = e;
+
+                        return crow::response(200, "Ok");
+                    });
+
     //Add many Vertices
     this->app_.route_dynamic(this->path+"/vertices")
             .methods(crow::HTTPMethod::Post)
@@ -148,7 +285,7 @@ void Router::setupRoutes() {
 
                         std::ostringstream os;
                         os << i << " Edges Added!";
-                        return crow::response(os.str());
+                        return crow::response(200,os.str());
                     });
 
     //Get many Edges
