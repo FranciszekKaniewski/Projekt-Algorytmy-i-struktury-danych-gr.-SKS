@@ -1,15 +1,15 @@
-import {Edge, Vertex} from "../../interfaces/interfaces.ts";
-import React, {Dispatch, SetStateAction, useState} from "react";
+import {Edge} from "../../interfaces/interfaces.ts";
+import React, {Dispatch, JSX, SetStateAction, useState} from "react";
 import {Fetch} from "../../utils/Fetch.tsx";
 
 type Props = {
     element: Edge;
-    vertices: Vertex[];
+    vertexOptions: JSX.Element[];
     edges: Edge[];
     setEdges: Dispatch<SetStateAction<Edge[]>>;
 }
 
-export const EdgeListElement = ({element,edges,vertices,setEdges}:Props) => {
+export const EdgeListElement = ({element,edges,vertexOptions,setEdges}:Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
 
@@ -34,8 +34,6 @@ export const EdgeListElement = ({element,edges,vertices,setEdges}:Props) => {
         setIsOpen(false);
     }
 
-    const options = vertices.map((v: Vertex) => (<option key={v.id} value={v.id}>{v.id}</option>))
-
     return (
         <>
             <li onClick={()=>setIsOpen(prevState => !prevState)}>
@@ -43,8 +41,8 @@ export const EdgeListElement = ({element,edges,vertices,setEdges}:Props) => {
             </li>
             {isOpen ?
                 <div>
-                    <span>Z punktu: {!editMode ? element.fromId : <select id="1" onChange={(e)=>setFromIdSelect(Number(e.target.value))} defaultValue={fromIdSelect}>{options}</select>}</span> <br/>
-                    <span>Z punktu: {!editMode ? element.toId : <select id="2" onChange={(e)=>setToIdSelect(Number(e.target.value))} defaultValue={toIdSelect}>{options}</select>}</span> <br/>
+                    <span>Z punktu: {!editMode ? element.fromId : <select id="1" onChange={(e)=>setFromIdSelect(Number(e.target.value))} defaultValue={fromIdSelect}>{vertexOptions}</select>}</span> <br/>
+                    <span>Z punktu: {!editMode ? element.toId : <select id="2" onChange={(e)=>setToIdSelect(Number(e.target.value))} defaultValue={toIdSelect}>{vertexOptions}</select>}</span> <br/>
                     <span>Kosz naprawy: {!editMode ? element.cost : <input type="number" onChange={(e)=>setCostInput(Number(e.target.value))} value={costInput}/>}</span> <br/>
                     {!editMode ?
                         <button onClick={()=>setEditMode(prev=>!prev)}>Edytuj</button> :

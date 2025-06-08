@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useState} from "react";
+import React, {Dispatch, SetStateAction, useMemo, useState} from "react";
 import {ArrowIcon} from "../../assets/icons/Arrow.tsx"
 import {Cross, Edge, Field, Vertex} from "../../interfaces/interfaces.ts";
 
@@ -52,6 +52,12 @@ export const List = ({vertices,edges,setVertices,setEdges}:Props) => {
         setIsOpen(prevState => !prevState)
     }
 
+    const vertexOptions = useMemo(() =>
+        vertices.map((v) => (
+            <option key={v.id} value={v.id}>{v.id}</option>
+        )), [vertices]
+    );
+
     const sendHandler = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         if(select !== "edge") await addOneVertex()
@@ -71,7 +77,7 @@ export const List = ({vertices,edges,setVertices,setEdges}:Props) => {
 
     const vElements = vertices.map(e=><MemoizedVertexListElement key={e.id} element={e} setVertices={setVertices} setEdges={setEdges}/>)
 
-    const eElements = edges.map(e=><MemoizedEdgeListElement key={e.id} element={e} edges={edges}  vertices={vertices} setEdges={setEdges}/>)
+    const eElements = edges.map(e=><MemoizedEdgeListElement key={e.id} element={e} edges={edges} vertexOptions={vertexOptions} setEdges={setEdges}/>)
 
     return(
         <div className="list" style={listStyle}>
