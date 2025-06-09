@@ -10,7 +10,7 @@ type Props = {
 
 export const FileInputSection = ({deleteData,fetchData,areData}:Props) => {
     const [jsonVertexData, setJsonVertexData] = useState<Vertex[]>([]);
-    const [jsonEdgesData, setJsonEdgesData] = useState<Edge[]>([]);
+    const [jsonEdgesData, setJsonEdgesData] = useState<Omit<Edge, 'id'>[]>([]);
     const [jsonQuadrantsData, setJsonQuadrantsData] = useState<Quadrant[]>([]);
 
     const file = useRef<HTMLInputElement>(null);
@@ -59,9 +59,9 @@ export const FileInputSection = ({deleteData,fetchData,areData}:Props) => {
     }
 
     const parseFileContent = (text: string) => {
-        setJsonVertexData([]);
-        setJsonEdgesData([]);
-        setJsonQuadrantsData([]);
+        const newVertices: Vertex[] = [];
+        const newEdges: Omit<Edge, 'id'>[] = [];
+        const newQuadrants: Quadrant[] = [];
 
         const linesArr = text.split("\n");
         const wordsArr = linesArr
@@ -69,39 +69,52 @@ export const FileInputSection = ({deleteData,fetchData,areData}:Props) => {
             .filter(l => l.length > 0)
             .map(l => l.split(" "));
 
-        wordsArr.forEach(e => {
-            if (e[0] === "F")
-                setJsonVertexData(pS => (
-                    [...pS, ({ type: e[0], production: Number(e[3] ?? 0), position: { x: Number(e[1]), y: Number(e[2]) } } as Field)]
-                ))
-            else if (e[0] === "C")
-                setJsonVertexData(pS => (
-                    [...pS, ({ type: e[0], limit: Number(e[3] ?? 0), position: { x: Number(e[1]), y: Number(e[2]) } } as Cross)]
-                ))
-            else if (e[0] === "B" || e[0] === "I")
-                setJsonVertexData(pS => (
-                    [...pS, ({ type: e[0], position: { x: Number(e[1]), y: Number(e[2]) } } as Vertex)]
-                ))
+        for (const e of wordsArr) {
+            if (e[0] === "F") {
+                newVertices.push({
+                    type: e[0],
+                    production: Number(e[3] ?? 0),
+                    position: { x: Number(e[1]), y: Number(e[2]) }
+                } as Field);
+            }
+            else if (e[0] === "C") {
+                newVertices.push({
+                    type: e[0],
+                    limit: Number(e[3] ?? 0),
+                    position: { x: Number(e[1]), y: Number(e[2]) }
+                } as Cross);
+            }
+            else if (e[0] === "B" || e[0] === "I") {
+                newVertices.push({
+                    type: e[0],
+                    position: { x: Number(e[1]), y: Number(e[2]) }
+                } as Vertex);
+            }
             else if (e[0] === "E") {
-                setJsonEdgesData(prevState => [...prevState, { fromId: e[1], toId: e[2], cost: e[3] ? Number(e[3]) : 0 }] as Edge[]);
+                newEdges.push({
+                    fromId: Number(e[1]),
+                    toId: Number(e[2]),
+                    cost: e[3] ? Number(e[3]) : 0
+                });
             }
             else if (e[0] === "Q") {
                 const production = Number(e[e.length - 1]);
                 const points: { x: number, y: number }[] = [];
 
-                let px = 0;
-                let x = true;
-                for (const string of e.slice(1, -1)) {
-                    if (x) px = Number(string);
-                    else {
-                        const py = Number(string);
-                        points.push({ x: px, y: py });
-                    }
-                    x = !x;
+                for (let i = 1; i < e.length - 1; i += 2) {
+                    points.push({
+                        x: Number(e[i]),
+                        y: Number(e[i + 1])
+                    });
                 }
-                setJsonQuadrantsData(prevState => [...prevState, { points, production }] as Quadrant[]);
+
+                newQuadrants.push({ points, production });
             }
-        });
+        }
+
+        setJsonVertexData(newVertices);
+        setJsonEdgesData(newEdges);
+        setJsonQuadrantsData(newQuadrants);
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
