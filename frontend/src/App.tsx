@@ -4,7 +4,7 @@ import crowLogo from './assets/crowLogo.png'
 import './App.css'
 import {useState} from "react";
 import {FileInput} from "./components/FileInput/FileInput.tsx";
-import {Map} from "./components/Map/Map.tsx";
+import {Mapa} from "./components/Map/Map.tsx";
 import {Edge, Path, Pathing, Quadrant, Vertex} from "./interfaces/interfaces.ts";
 
 function App() {
@@ -22,7 +22,7 @@ function App() {
           <h1>Projek Algorytmy i Struktury danych</h1>
           <FileInput setVertices={setVertices} setEdges={setEdges} setPathing={setPathing} showPaths={showPaths}
                      setShowPaths={setShowPaths} setQuadrants={setQuadrants} areData={!(vertices.length || edges.length || quadrants?.length)}/>
-          <Map vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing}
+          <Mapa vertices={vertices ?? []} edges={edges ?? []} quadrants={quadrants ?? []} pathing={pathing}
                showPaths={showPaths} setVertices={setVertices} setEdges={setEdges}/>
 
           <h3> Uniwersytet Mikołaja Kopernika w Toruniu 2025 <br/> Franciszek Kaniewski | Kacper Smolarczyk | Jarema
