@@ -51,7 +51,7 @@ MaxFlowSolver::MaxFlowSolver(std::vector<Vertex*>& vertices, std::vector<Edge*>&
             adj[v->id].push_back(barleySink);
 
             capacity[v->id][barleySink] = 1410065408;
-            capacity[barleySink][v->id] = 1410065408;
+            capacity[barleySink][v->id] = 0;
 
             cost[v->id][barleySink] = 0;
             cost[barleySink][v->id] = 0;
