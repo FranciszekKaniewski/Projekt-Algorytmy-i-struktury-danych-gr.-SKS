@@ -4,6 +4,8 @@
 #include "./headers/mapQuadrants.hpp"
 #include "./headers/KMPSolver.hpp"
 #include <initializer_list>
+#include <codecvt>
+#include <locale>
 
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
         : app_(app), allVertices(allVertices), allEdges(allEdges), path(path) {
@@ -506,6 +508,15 @@ void Router::setupRoutes() {
        this->app_.route_dynamic(this->path+"/KMP")
             .methods(crow::HTTPMethod::Post)
                     ([](const crow::request& req) {
+                        wstring utf8_to_wstring(const string& str) {
+                            wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+                            return converter.from_bytes(str);
+                        }
+                        string wstring_to_utf8(const wstring& wstr) {
+                            wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+                            return converter.to_bytes(wstr);
+                        }
+
                         auto body = crow::json::load(req.body);
                         if (!body) {
                             return crow::response(400, "Invalid JSON");
@@ -514,8 +525,11 @@ void Router::setupRoutes() {
                             return crow::response(400, "Allows only one item and item must have 'text' and 'pattern'");
                         }
 
-                        string tekst = body[0]["text"].s();
-                        string pattern = body[0]["pattern"].s();
+                        string tekst_utf8 = body[0]["text"].s();
+                        string pattern_utf8 = body[0]["pattern"].s();
+
+                        wstring tekst = utf8_to_wstring(tekst_utf8);
+                        wstring pattern = utf8_to_wstring(pattern_utf8);
 
                         KMPSolver rob(tekst, pattern);
                         vector<KMPAns> wyniki = rob.KMP();
@@ -525,16 +539,15 @@ void Router::setupRoutes() {
 
                         int i = 0;
                         for (const auto& wynik : wyniki) {
-                            crow::json::wvalue pattern;
+                            crow::json::wvalue pattern_json;
 
-                            pattern["row"] = wynik.row;
-                            pattern["column"] = wynik.column;
-                            pattern["length"] = wynik.length;
-                            pattern["lineText"] = wynik.lineText;
+                            pattern_json["row"] = wynik.row;
+                            pattern_json["column"] = wynik.column;
+                            pattern_json["length"] = wynik.length;
+                            pattern_json["lineText"] = wstring_to_utf8(wynik.lineText);
 
-                            vertices_json[i++] = std::move(pattern);
+                            vertices_json[i++] = std::move(pattern_json);
                         }
-
-                        return crow::response(200, vertices_json);
-                    });
+                return crow::response(200, vertices_json);
+            });
 }

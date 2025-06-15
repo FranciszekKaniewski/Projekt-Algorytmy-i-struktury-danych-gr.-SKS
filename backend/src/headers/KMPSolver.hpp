@@ -8,21 +8,20 @@ struct KMPAns {
     int row;
     int column;
     int length;
-    string lineText;
+    wstring lineText;
 };
 
 class KMPSolver {
 private:
-    string tekst;
-    string patern;
+    wstring tekst;
+    wstring patern;
     int length;
 
-    vector<int> kmpPrefixTable(const string& pattern);
-
-    vector<int> kmpSearch(const string& line, const string& pattern);
+    vector<int> kmpPrefixTable(const wstring& pattern);
+    vector<int> kmpSearch(const wstring& line, const wstring& pattern);
 
 public:
-    KMPSolver(const string& tekst, const string& patern): tekst(tekst), patern(patern), length(patern.length()) {}
+    KMPSolver(const wstring& tekst, const wstring& patern): tekst(tekst), patern(patern), length(patern.length()) {}
 
     vector<KMPAns> KMP(); 
 };

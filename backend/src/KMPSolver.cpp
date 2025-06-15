@@ -1,14 +1,13 @@
 #include "./headers/KMPSolver.hpp"
 
-
 vector<KMPAns> KMPSolver::KMP() {
     vector<KMPAns> wyniki;
-    istringstream iss(tekst);
-    string linia;
+    wstringstream iss(tekst);
+    wstring linia;
     int numer_linii = 1;
 
     while (getline(iss, linia)) {
-    vector<int> trafienia = kmpSearch(linia, patern);
+        vector<int> trafienia = kmpSearch(linia, patern);
         for (int indeks : trafienia) {
             KMPAns wynik;
             wynik.row = numer_linii;
@@ -17,13 +16,13 @@ vector<KMPAns> KMPSolver::KMP() {
             wynik.lineText = linia;
             wyniki.push_back(wynik);
         }
-      numer_linii++;
+        numer_linii++;
     }
 
-    return wyniki;    
+    return wyniki;
 }
 
-vector<int> KMPSolver::kmpPrefixTable(const string& pattern){
+vector<int> KMPSolver::kmpPrefixTable(const wstring& pattern) {
     int m = pattern.size();
     vector<int> prefix(m, 0);
     int j = 0;
@@ -39,7 +38,7 @@ vector<int> KMPSolver::kmpPrefixTable(const string& pattern){
     return prefix;
 }
 
-vector<int> KMPSolver::kmpSearch(const string& line, const string& pattern) {
+vector<int> KMPSolver::kmpSearch(const wstring& line, const wstring& pattern) {
     vector<int> positions;
     vector<int> prefix = kmpPrefixTable(pattern);
     int n = line.size();
