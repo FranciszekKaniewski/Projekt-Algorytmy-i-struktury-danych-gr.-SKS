@@ -112,7 +112,6 @@ export const Mapa = ({vertices,edges,quadrants,pathing,showPaths,setVertices,set
     const edgesMap = useMemo(() => {
         const map = new Map<string, Edge>();
         edges.forEach(edge => {
-            // Tworzymy unikalny klucz dla krawędzi
             map.set(`${edge.fromId}_${edge.toId}`, edge);
         });
         return map;
@@ -159,7 +158,7 @@ export const Mapa = ({vertices,edges,quadrants,pathing,showPaths,setVertices,set
                 fill="rgba(150, 255, 100, 0.3)"
                 stroke="rgba(20, 150, 20, 1)"
                 strokeWidth={2}
-                listening={false} // Ćwiartki nie potrzebują eventów myszy
+                listening={false}
             />
         );
     }), [quadrants]);
@@ -170,9 +169,10 @@ export const Mapa = ({vertices,edges,quadrants,pathing,showPaths,setVertices,set
 
         if (!vFrom || !vTo) return null;
 
-        const edge = edgesMap.get(`${e.fromId}_${e.toId}`);
+        const fromIdEdge = edgesMap.get(`${e.fromId}_${e.toId}`);
+        const edge = fromIdEdge ? fromIdEdge : edgesMap.get(`${e.toId}_${e.fromId}`);
 
-        const showCost = showPaths?.costs && edge ? `/${ToFixed(edge.cost)}` : "";
+        const showCost = `/${ToFixed(edge ? edge.cost : 0)}`;
 
         const fontSize = 12 / scale;
 
@@ -186,7 +186,7 @@ export const Mapa = ({vertices,edges,quadrants,pathing,showPaths,setVertices,set
                     text={`${ToFixed(e.amount)}${showCost}`}
                     fontSize={fontSize}
                     fontFamily={'Calibri'}
-                    listening={false} // Tekst nie musi reagować na myszkę
+                    listening={false}
                 />
                 <Arrow
                     key={"path"+i*100}
