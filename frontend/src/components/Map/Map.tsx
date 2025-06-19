@@ -172,7 +172,7 @@ export const Mapa = ({vertices,edges,quadrants,pathing,showPaths,setVertices,set
         const fromIdEdge = edgesMap.get(`${e.fromId}_${e.toId}`);
         const edge = fromIdEdge ? fromIdEdge : edgesMap.get(`${e.toId}_${e.fromId}`);
 
-        const showCost = `/${ToFixed(edge ? edge.cost : 0)}`;
+        const showCost = showPaths?.costs ? `/${ToFixed(edge ? edge.cost : 0)}` : '';
 
         const fontSize = 12 / scale;
 
