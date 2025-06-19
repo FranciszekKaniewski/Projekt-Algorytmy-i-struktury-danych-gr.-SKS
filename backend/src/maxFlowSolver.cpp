@@ -139,7 +139,7 @@ float MaxFlowSolver::maxFlow(std::vector<tuple<int,int,float>>& used_edges, std:
                 }else if(isBeerCreated){
                     if(auto* b = dynamic_cast<Brewery*>(vertices[u])) {
                         b->storage = 0;
-                        cout<<b->storage<<endl;
+
                         this->capacity[b->id][this->barleySink] = b->storage;
                         this->capacity[this->barleySink][b->id] = b->storage;
                     }
