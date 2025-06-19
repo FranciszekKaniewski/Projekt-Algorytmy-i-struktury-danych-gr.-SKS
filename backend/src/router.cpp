@@ -7,6 +7,15 @@
 #include <codecvt>
 #include <locale>
 
+wstring utf8_to_wstring(const string& str) {
+    wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.from_bytes(str);
+}
+string wstring_to_utf8(const wstring& wstr) {
+    wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(wstr);
+}
+
 Router::Router(crow::App<crow::CORSHandler>& app, std::vector<Vertex*> allVertices, std::vector<Edge*> allEdges, std::string path)
         : app_(app), allVertices(allVertices), allEdges(allEdges), path(path) {
     setupRoutes();
@@ -508,14 +517,6 @@ void Router::setupRoutes() {
        this->app_.route_dynamic(this->path+"/KMP")
             .methods(crow::HTTPMethod::Post)
                     ([](const crow::request& req) {
-                        wstring utf8_to_wstring(const string& str) {
-                            wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-                            return converter.from_bytes(str);
-                        }
-                        string wstring_to_utf8(const wstring& wstr) {
-                            wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-                            return converter.to_bytes(wstr);
-                        }
 
                         auto body = crow::json::load(req.body);
                         if (!body) {
