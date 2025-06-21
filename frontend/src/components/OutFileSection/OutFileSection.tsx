@@ -1,4 +1,3 @@
-import {getDataFromOutText} from "../../utils/GetDataFromOutText.ts";
 import {Fetch} from "../../utils/Fetch.tsx";
 import {KMPResponse} from "../../interfaces/interfaces.ts";
 

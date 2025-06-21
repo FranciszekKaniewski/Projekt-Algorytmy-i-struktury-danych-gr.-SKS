@@ -89,7 +89,7 @@ export const List = ({vertices,edges,setVertices,setEdges}:Props) => {
                         <option value="field">Pole</option>
                         <option value="inn">Karczma</option>
                         <option value="brewery">Browar</option>
-                        <option value="cross">Skrzyrzowanie</option>
+                        <option value="cross">Skrzyżowanie</option>
                         <option value="edge">Droga</option>
                     </select>
                     {select !== 'edge' && <div>

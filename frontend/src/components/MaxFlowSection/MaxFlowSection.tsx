@@ -56,11 +56,11 @@ export const MaxFlowSection = ({setPathing,showPaths,setShowPaths,areData,setMax
             } else {
                 textPaths += `Ścieżka ${pathCount++}: Przewieź ${entry.amount} ${entry.transports === "beer" ? "Piwa" : "Jęczmienia"} z punktu ${entry.fromId} do ${entry.toId} \n`;
             }
-
+            
             if ("minCostBarleyTransport" in entry) {
-                text += `Minimalny koszt naprawy scierzek dla przewozu jęczmienia: ${entry.minCostBarleyTransport} 🌾\n\n`;
+                text += `Minimalny koszt naprawy scieżek dla przewozu jęczmienia: ${entry.minCostBarleyTransport} 🌾\n\n`;
             }else if ("minCostBeerTransport" in entry) {
-                text += `Minimalny koszt naprawy scierzek dla przewozu piwa: ${entry.minCostBeerTransport} 🍺\n\n`;
+                text += `Minimalny koszt naprawy scieżek dla przewozu piwa: ${entry.minCostBeerTransport} 🍺\n\n`;
             }
         });
 
@@ -81,7 +81,7 @@ export const MaxFlowSection = ({setPathing,showPaths,setShowPaths,areData,setMax
                 className='refresh-btn'
                 disabled={areData}
                 onClick={() => maxFlowHandler(true)}>
-                {showPaths === null ? "Oblicz MaxFlow z min. kosztami 📊💸" : showPaths.type === "barley" ? "Pokaż ścieżki dla piwa 🍺" : "Pokaż ścieżki dla jęczmienia 🌾"}
+                {showPaths === null ? "Oblicz MaxFlow z min. kosztami 📊💸" : showPaths.type === "barley" ? "Pokaż scieżki dla piwa 🍺" : "Pokaż ścieżki dla jęczmienia 🌾"}
             </button> : null}
             {showPaths !== null ?
                 <button

@@ -3,7 +3,7 @@ export const Translate = (text: string) => {
         case "FIELD":
             return "Pole"
         case "CROSS":
-            return "Skrzyrzowanie"
+            return "Skrzyżowanie"
         case "INN":
             return "Karczma"
         case "BREWERY":
