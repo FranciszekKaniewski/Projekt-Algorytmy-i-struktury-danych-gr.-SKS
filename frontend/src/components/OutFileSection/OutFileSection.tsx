@@ -28,10 +28,6 @@ export const OutFileSection = ({showRawData,setShowRawData,pattern,setPattern,sh
         URL.revokeObjectURL(url);
     };
 
-    const downloadBinFile = () => {
-        getDataFromOutText(filtredMaxFlowOutFile);
-    };
-
     const toggleRawData = () => {
         setShowRawData(prev => !prev);
     };
@@ -84,9 +80,6 @@ export const OutFileSection = ({showRawData,setShowRawData,pattern,setPattern,sh
                 <div className="mt-4 flex gap-4">
                     <button
                         onClick={downloadFile}>Pobierz plik transportu 💾
-                    </button>
-                    <button
-                        onClick={downloadBinFile}>Pobierz plik transportu 💾
                     </button>
                     <button
                         onClick={toggleRawData}>{showRawData ? "Ukryj plik transportu 📋" : "Pokaż plik transportu 📋"}

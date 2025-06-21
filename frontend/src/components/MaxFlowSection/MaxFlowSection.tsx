@@ -75,13 +75,13 @@ export const MaxFlowSection = ({setPathing,showPaths,setShowPaths,areData,setMax
                 className='refresh-btn'
                 disabled={areData}
                 onClick={() => maxFlowHandler(false)}>
-                {showPaths === null ? "Oblicz MaxFlow 📊" : showPaths.type === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
+                {showPaths === null ? "Oblicz MaxFlow 📊" : showPaths.type === "barley" ? "Pokaż ścieżki dla piwa 🍺" : "Pokaż ścieżki dla jęczmienia 🌾"}
             </button> : null}
             {showPaths?.costs !== false ? <button
                 className='refresh-btn'
                 disabled={areData}
                 onClick={() => maxFlowHandler(true)}>
-                {showPaths === null ? "Oblicz MaxFlow z min. kosztami 📊💸" : showPaths.type === "barley" ? "Pokaż scieszki dla piwa 🍺" : "Pokaż scieszki dla jęczmienia 🌾"}
+                {showPaths === null ? "Oblicz MaxFlow z min. kosztami 📊💸" : showPaths.type === "barley" ? "Pokaż ścieżki dla piwa 🍺" : "Pokaż ścieżki dla jęczmienia 🌾"}
             </button> : null}
             {showPaths !== null ?
                 <button

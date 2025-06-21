@@ -143,7 +143,7 @@ export const FileInputSection = ({deleteData,fetchData,areData}:Props) => {
 
     return (
         <>
-            <span>Test files: </span>
+            <span>Pliki Testowe: </span>
             <a href="/test-file-1.txt" target="_blank" onClick={() => loadExampleFile("/test-file-1.txt")}> plik_1</a> |
             <a href="/test-file-2.txt" target="_blank" onClick={() => loadExampleFile("/test-file-2.txt")}> plik_2</a> |
             <a href="/test-file-3.txt" target="_blank" onClick={() => loadExampleFile("/test-file-3.txt")}> plik_3</a>

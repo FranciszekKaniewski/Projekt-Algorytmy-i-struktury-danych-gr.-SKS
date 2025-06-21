@@ -43,7 +43,7 @@ export const EdgeListElement = ({element,edges,vertexOptions,setEdges}:Props) =>
                 <div>
                     <span>Z punktu: {!editMode ? element.fromId : <select id="1" onChange={(e)=>setFromIdSelect(Number(e.target.value))} defaultValue={fromIdSelect}>{vertexOptions}</select>}</span> <br/>
                     <span>Z punktu: {!editMode ? element.toId : <select id="2" onChange={(e)=>setToIdSelect(Number(e.target.value))} defaultValue={toIdSelect}>{vertexOptions}</select>}</span> <br/>
-                    <span>Kosz naprawy: {!editMode ? element.cost : <input type="number" onChange={(e)=>setCostInput(Number(e.target.value))} value={costInput}/>}</span> <br/>
+                    <span>Koszt naprawy: {!editMode ? element.cost : <input type="number" onChange={(e)=>setCostInput(Number(e.target.value))} value={costInput}/>}</span> <br/>
                     {!editMode ?
                         <button onClick={()=>setEditMode(prev=>!prev)}>Edytuj</button> :
                         <>
