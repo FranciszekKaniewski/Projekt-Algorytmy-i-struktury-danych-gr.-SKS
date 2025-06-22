@@ -1,38 +1,37 @@
 # PROJEKT ALGORYTMY
 ### SPIS TRESCI
 1. [Opis projektu](#opis-projektu) 
-2. Formalizacja 3
-3. Zastosowane Algorytmy 4
-4. Implementacja
-5. s
-6. s
-7. s
-8. s
-9. [How to run](#how-to-run)
+2. [Wstęp](#wstęp)
+3. [Zastosowane Algorytmy](#zastosowane-algorytmy) 
+4. [Testy](#testy)
+5. [Wnioski](#wnioski)
+6. [Podsumowanie](#podsumowanie)
+7. [How to run](#how-to-run)
 
 ## opis projektu
-Członkowie grupy: Franciszek Kaniewski, Jerema Szyński, Kacper Smolarczyk
-Język programowania: C++
-Uniwersytet Mikołaja Kopernika w Toruniu - wydział matematyki i informatyki
 
-## WSTĘP
-Cel projektu: Zaprojektowanie i zaimplementowanie algorytmu umożliwiającego maksymalizację ilości piwa dostarczanego do karczm w Shire przy uwzględnieniu ograniczeń transportowych i kosztów.
-Zakres problemu: Reprezentacja infrastruktury kraju (pola, browary, karczmy, drogi), przetwarzanie informacji przestrzennych, obliczanie przepustowości i kosztów napraw.
+**Członkowie grupy:** Franciszek Kaniewski, Jerema Szyński, Kacper Smolarczyk
 
-## Formalizacja
-Wejscie:
-Wyjscie:
-Ograniczenia:
-Reprezentacja:
+**Język programowania:** C++
 
-## Zastosowane Algorytmy
-⦁	Max Flow
+**Uniwersytet Mikołaja Kopernika w Toruniu - wydział matematyki i informatyki**
 
-⦁	Min Cost Max Flow
+## wstęp
 
-⦁ MapQuadrants - Ćwiartki mapy
+**Cel projektu:** Zaprojektowanie i zaimplementowanie algorytmu umożliwiającego maksymalizację ilości piwa dostarczanego do karczm w Shire przy uwzględnieniu ograniczeń transportowych i kosztów.
+
+**Zakres problemu:** Reprezentacja infrastruktury kraju (pola, browary, karczmy, drogi), przetwarzanie informacji przestrzennych, obliczanie przepustowości i kosztów napraw.
+
+## zastosowane algorytmy
+
+⦁	**Max Flow** – zdefiniowane węzły i połączenia sieciowe.
+----------------------------------------------------------------------------------------------------------------------------------
+⦁	**Min Cost Max Flow** – uwzględnienie kosztów transportu i przepustowości.
+-----------------------------------------------------------------------------------------------------------------------------------
+⦁ **MapQuadrants** - Ćwiartki mapy
 
 Opis:
+
 Kod służy do przypisywania wartości produkcji polom na podstawie ich położenia względem zdefiniowanych obszarów (ćwiartek). Każda ćwiartka to wielokąt określony przez punkty (Point), któremu przypisana jest konkretna wartość produkcji.
 
 Klasa MapQuadrants zarządza wszystkimi ćwiartkami oraz analizuje, do której z nich należy każde pole. Jeśli pole znajduje się wewnątrz jakiegoś obszaru, jego produkcja zostaje ustawiona zgodnie z przypisaną wartością ćwiartki.
@@ -114,37 +113,37 @@ Uwagi:
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
-⦁	Algorytm Wyszukiwania w tekscie(KMP)
+⦁	**Algorytm Wyszukiwania w tekscie KMP (Knutha-Morrisa-Pratta)** - efektywny algorytm wyszukiwania wzorca w tekście, który działa w czasie liniowym względem długości tekstu i wzorca. Jego główną zaletą jest to, że unika ponownego porównywania znaków, które już zostały dopasowane.
+
 Klasa KMPSolver implementuje algorytm Knutha-Morrisa-Pratta (KMP) służący do wyszukiwania wzorca w wieloliniowym tekście. Obsługuje teksty zawierające polskie znaki dzięki konwersji UTF-8 na wstring
 
 ```KMPSolver(const string& tekst_utf8, const string& patern_utf8);```
 
 Tworzy instancję klasy KMPSolver, konwertując wejściowe łańcuchy znaków z UTF-8 (string) na wstring.
-METODY PUBLICZNE:
+
+Metody publiczne: 
 Wyszukuje wszystkie wystąpienia wzorca w każdej linii tekstu. Dla każdego dopasowania tworzy strukturę KMPAns z informacjami o lokalizacji.
-Zwraca:
+
+Zwraca: 
 Wektor struktur KMPAns, zawierających dane o wszystkich dopasowaniach wzorca.
-METODY PRYWATNE:
+
+Metody prywatne: 
 
 ```vector<int> kmpPrefixTable(const wstring& pattern);```
 
-Opis:
-
+Opis: 
 Tworzy tablicę prefiksową dla danego wzorca, wykorzystywaną w algorytmie KMP 
 do optymalizacji przeskoków.
 
-Zwraca:
-
+Zwraca: 
 Wektor prefix, gdzie prefix[i] to długość najdłuższego prefiksu będącego jednocześnie sufiksem podciągu pattern[0..i].
 
 ```vector<int> kmpSearch(const wstring& line, const wstring& pattern);```
 
-Opis:
-
+Opis: 
 Wyszukuje wszystkie wystąpienia wzorca w jednej linii tekstu, wykorzystując tablicę prefiksową.
 
-Zwraca:
-
+Zwraca: 
 Wektor indeksów pozycji początkowych dopasowań wzorca w danej linii.
 
 UWAGI:
@@ -155,19 +154,93 @@ UWAGI:
 
 ⦁	Działa na każdej linii osobno – nie wykrywa dopasowań "przez granice wierszy"
 
-## Implementacja
+Złożoność O(n+m)
 
-## Analiza złozonosci
+n - długość tekstu 
 
-## Prezentacja działania programu
+m - długość wzorca
 
-## TESTY
+## testy
 
-## Wnioski
+**MaxFlow**
+```bash
+I 100 200
+F 200 200 3.3
+C 300 200 4.26
+B 400 200
 
-## Podsumowanie
+E 0 1
+E 1 2
+E 2 3
+```
+**MaxFlowWithCosts**
+```bash
+F 100 100 10
+C 200 100 5
+B 300 100
 
-## 🛠 Jak Uruchomić
+E 0 1
+E 1 2
+
+BarleyPath 0 1 5
+BarleyPath 1 2 5
+
+END
+```
+
+**Web build test**
+```bash
+F 100 100 10
+C 200 100 5
+B 300 100
+
+E 0 1
+E 1 2
+
+Source: 3
+BarleySink: 4
+Sink: 5
+isBeerReady: 0
+
+Capacity 0 = 0 5 0 0 0 0
+Capacity 1 = 5 0 5 0 0 0
+Capacity 2 = 0 5 0 0 INF 0
+Capacity 3 = 10 0 0 0 0 0
+Capacity 4 = 0 0 INF 0 0 0
+Capacity 5 = 0 0 0 0 0 0
+
+FlowPassed 0 = 0 0 0 0 0 0
+FlowPassed 1 = 0 0 0 0 0 0
+FlowPassed 2 = 0 0 0 0 0 0
+FlowPassed 3 = 0 0 0 0 0 0
+FlowPassed 4 = 0 0 0 0 0 0
+FlowPassed 5 = 0 0 0 0 0 0
+
+Adj 0 = 1 3
+Adj 1 = 0 2
+Adj 2 = 1 4
+Adj 3 = 0
+Adj 4 = 2
+Adj 5 =
+
+END
+```
+
+## wnioski
+
+-Projekt prezentuje solidne zrozumienie algorytmów grafowych oraz ich implementacji w praktycznych problemach.
+
+-Dobrze zaprojektowana struktura kodu i dokumentacji ułatwia rozwój oraz testowanie.
+
+-Implementacja algorytmu KMP z obsługą UTF-8 to miły dodatek, świadczący o dbałości o szczegóły.
+
+-Docker zapewnia powtarzalność środowiska, co jest dużym plusem w projektach edukacyjnych i zespołowych.
+
+## podsumowanie
+
+W ramach projektu zrealizowano kompletny system umożliwiający modelowanie i optymalizację dostaw piwa do karczm w świecie Shire. Projekt łączy teorię grafów, algorytmy przepływu i wyszukiwania tekstu w praktycznej implementacji w języku C++. Zaimplementowano kluczowe algorytmy: Max Flow, Min Cost Max Flow, MapQuadrants oraz KMP. Dodatkowo przygotowano zestaw testów weryfikujących poprawność implementacji oraz uruchamianie całego środowiska za pomocą Docker Compose, co pozwala łatwo testować i rozwijać aplikację.
+
+## how to run
 1. Klonowanie repozytorium:
     ```bash
     git clone https://github.com/FranciszekKaniewski/Projekt-Algorytmy-i-struktury-danych-gr.-SKS.git
