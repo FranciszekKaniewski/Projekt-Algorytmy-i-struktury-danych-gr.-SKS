@@ -24,7 +24,7 @@
 
 ## zastosowane algorytmy
 
-⦁	**Max Flow** – zdefiniowane węzły i połączenia sieciowe.
+- ### **Max Flow** – zdefiniowane węzły i połączenia sieciowe.
 
 `MaxFlowSolver` to klasa odpowiedzialna za obliczenie maksymalnego przepływu w sieci przepływu z ograniczonymi przepustowościami. Struktura systemu obejmuje specjalne wierzchołki pomocnicze dla etapów produkcji jęczmienia i dystrybucji piwa.
 
@@ -88,9 +88,9 @@ Oblicza maksymalny możliwy przepływ od źródła do ujścia.
 
 
 ----------------------------------------------------------------------------------------------------------------------------------
-⦁	**Min Cost Max Flow** – uwzględnienie kosztów transportu i przepustowości.
+- ### **Min Cost Max Flow** – uwzględnienie kosztów transportu i przepustowości.
 -----------------------------------------------------------------------------------------------------------------------------------
-⦁ **MapQuadrants** - Ćwiartki mapy
+- ### **MapQuadrants** - Ćwiartki mapy
 
 Opis:
 
@@ -176,7 +176,9 @@ Uwagi:
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
-⦁	**Algorytm Wyszukiwania w tekscie KMP (Knutha-Morrisa-Pratta)** - efektywny algorytm wyszukiwania wzorca w tekście, który działa w czasie liniowym względem długości tekstu i wzorca. Jego główną zaletą jest to, że unika ponownego porównywania znaków, które już zostały dopasowane.
+- ### **Algorytm Wyszukiwania w tekscie KMP (Knutha-Morrisa-Pratta)**
+
+Efektywny algorytm wyszukiwania wzorca w tekście, który działa w czasie liniowym względem długości tekstu i wzorca. Jego główną zaletą jest to, że unika ponownego porównywania znaków, które już zostały dopasowane.
 
 Klasa `KMPSolver` implementuje algorytm Knutha-Morrisa-Pratta (KMP) służący do wyszukiwania wzorca w wieloliniowym tekście. Obsługuje teksty zawierające polskie znaki dzięki konwersji `UTF-8` na `wstring`
 
