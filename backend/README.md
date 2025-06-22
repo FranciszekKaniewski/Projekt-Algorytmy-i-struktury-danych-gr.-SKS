@@ -10,7 +10,7 @@
 
 ## opis projektu
 
-**Członkowie grupy:** Franciszek Kaniewski, Jerema Szyński, Kacper Smolarczyk
+**Członkowie grupy:** Franciszek Kaniewski, Jarema Szyński, Kacper Smolarczyk
 
 **Język programowania:** C++
 
@@ -25,6 +25,68 @@
 ## zastosowane algorytmy
 
 ⦁	**Max Flow** – zdefiniowane węzły i połączenia sieciowe.
+
+`MaxFlowSolver` to klasa odpowiedzialna za obliczenie maksymalnego przepływu w sieci przepływu z ograniczonymi przepustowościami. Struktura systemu obejmuje specjalne wierzchołki pomocnicze dla etapów produkcji jęczmienia i dystrybucji piwa.
+
+```MaxFlowSolver(std::vector<Vertex*>& vertices, std::vector<Edge*>& edges);```
+
+**Parametry:**
+
+`vertices` – lista wierzchołków (`Field`, `Cross`, `Brewery`, `Inn`).
+
+`edges` – lista krawędzi między wierzchołkami.
+
+**Działanie:**
+
+Tworzy graf z dodatkowymi wierzchołkami: `source` (źródło jęczmienia), `barleySink` (tymczasowy zbiornik browarów), `sink` (ujście piwa).
+
+Dla każdego typu wierzchołka:
+
+`Field`: łączy z `source` z limitem odpowiadającym produkcji.
+
+`Cross`: ogranicza przepustowości na sąsiednich krawędziach (limit).
+
+`Brewery`: łączy z `barleySink`.
+
+`Inn`: łączy z `sink`.
+
+
+```bool bfs(std::vector<float>& parent)```
+
+Wyszukuje ścieżkę powiększającą (algorytm BFS) w aktualnym stanie przepływu.
+
+**Zwraca:**
+
+-`true`, jeśli istnieje możliwa do użycia ścieżka.
+
+-`false`, jeśli nie ma już możliwości zwiększenia przepływu.
+
+```float maxFlow(std::vector<tuple<int,int,float>>& used_edges, std::vector<Vertex*> vertices)```
+
+Oblicza maksymalny możliwy przepływ od źródła do ujścia.
+
+**Parametry:**
+
+`used_edges` – krawędzie wykorzystane w przepływie, zapisywane jako (`start`, `end`, `flow`).
+
+`vertices` – lista wierzchołków, potrzebna do aktualizacji magazynów (`Brewery`).
+
+ **Działanie:**
+
+1. Inicjalizuje przepływy jako 0.
+
+2. Szuka ścieżek powiększających za pomocą `bfs`.
+
+3. W każdej iteracji:
+
+   - Oblicza minimalny przepływ możliwy na ścieżce (`path_flow`).
+   - Aktualizuje przepływy w macierzy `flowPassed`.
+   - Dodaje wykorzystane krawędzie do `used_edges`.
+   - Aktualizuje stan `Brewery`:
+     - Etap 1: zwiększa `storage`.
+     - Etap 2: zeruje `storage`.
+
+
 ----------------------------------------------------------------------------------------------------------------------------------
 ⦁	**Min Cost Max Flow** – uwzględnienie kosztów transportu i przepustowości.
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -34,74 +96,75 @@ Opis:
 
 Kod służy do przypisywania wartości produkcji polom na podstawie ich położenia względem zdefiniowanych obszarów (ćwiartek). Każda ćwiartka to wielokąt określony przez punkty (Point), któremu przypisana jest konkretna wartość produkcji.
 
-Klasa MapQuadrants zarządza wszystkimi ćwiartkami oraz analizuje, do której z nich należy każde pole. Jeśli pole znajduje się wewnątrz jakiegoś obszaru, jego produkcja zostaje ustawiona zgodnie z przypisaną wartością ćwiartki.
+Klasa `MapQuadrants` zarządza wszystkimi ćwiartkami oraz analizuje, do której z nich należy każde pole. Jeśli pole znajduje się wewnątrz jakiegoś obszaru, jego produkcja zostaje ustawiona zgodnie z przypisaną wartością ćwiartki.
 
 Do sprawdzania, czy punkt leży wewnątrz wielokąta, używany jest algorytm oparty na znaku iloczynów wektorowych – działa poprawnie także wtedy, gdy punkt leży dokładnie na krawędzi.
 
 Użyte Struktury:
 
-struct Point - reprezentuje dwuwymiarowy punkt.
+`struct Point` - reprezentuje dwuwymiarowy punkt.
 
-⦁ float x - Współrzędna X punktu
+⦁ `float x` - Współrzędna X punktu
 
-⦁ float y - Współrzędna Y punktu
+⦁ `float y` - Współrzędna Y punktu
 
 Użyte Klasy:
 
-class Quadrant - Reprezentuje jeden z obszarów (wielokątów), które mogą przypisywać produkcję do pól (Field).
+`class Quadrant` - Reprezentuje jeden z obszarów (wielokątów), które mogą przypisywać produkcję do pól (Field).
 
-⦁ vector<Point> points - Wierzchołki wielokąta definiujące granice ćwiartki.
+⦁ `vector<Point> points` - Wierzchołki wielokąta definiujące granice ćwiartki.
 
-⦁ float assignedProduction - Wartość produkcji przypisana polom znajdującym się w tym obszarze (domyślnie ustawiana na -1).
+⦁ `float assignedProduction` - Wartość produkcji przypisana polom znajdującym się w tym obszarze (domyślnie ustawiana na -1).
 
 Metody Klasy Quadrant:
 
-⦁ Quadrant(const vector<Point>& numbers, float production) - Konstruktor przypisujący punkty i wartość produkcji.
+⦁ `Quadrant(const vector<Point>& numbers, float production)` - Konstruktor przypisujący punkty i wartość produkcji.
 
-- const vector<Point>& numbers - lista wszystkich wierzchołków
+- `const vector<Point>& numbers` - lista wszystkich wierzchołków
 
-- float production - określona wartośc produkcji dla danej ćwiartki.
+- `float production` - określona wartośc produkcji dla danej ćwiartki.
   
-⦁ bool isInside(Field* f)
+⦁ `bool isInside(Field* f)`
 
-- Field* f – wskaźnik do obiektu Field.
+- `Field* f` – wskaźnik do obiektu Field.
   
 ⦁ Opis funkcji:
   
--Jej działanie opiera się na własnościach iloczynu wektorowego, zadanego wzorem - (b.x - a.x) * (py - a.y) - (b.y - a.y) * (px - a.x);
+-Jej działanie opiera się na własnościach iloczynu wektorowego, zadanego wzorem - `(b.x - a.x) * (py - a.y) - (b.y - a.y) * (px - a.x);`
 
 -Po obliczeniu iloczynu wektorowego, sprawdzamy jego wartość. Gdy jest ona większa od 0, oznacza to, że leży on po lewej stronie krawędzi AB, natomiast jeżeli jest mniejsza od 0 to po prawej stronie. Gdy wartość jest równa 0, to punkt P leży na tej krawędzi.
 
 Zwraca:
 
--Dla każdego punktu zwraca odpowiednią wartość true lub false, zależną od przynależności do wielokąta.
+-Dla każdego punktu zwraca odpowiednią wartość `true` lub `false`, zależną od przynależności do wielokąta.
   
-class MapQuadrants - Zarządza zestawem obszarów (ćwiartek), przypisuje wartości produkcji polom (Field) na podstawie ich położenia.
+`class MapQuadrants` - Zarządza zestawem obszarów (ćwiartek), przypisuje wartości produkcji polom (Field) na podstawie ich położenia.
 
-⦁ vector<Quadrant*> quadrants - Lista zdefiniowanych ćwiartek
+⦁ `vector<Quadrant*> quadrants` - Lista zdefiniowanych ćwiartek
 
-⦁ MapQuadrants(){} - Domyślny konstruktor.
+⦁ `MapQuadrants(){}` - Domyślny konstruktor.
 
-⦁ MapQuadrants(vector<Vertex*> allVertices, vector<pair<vector<Point>, float>> points)
+⦁ `MapQuadrants(vector<Vertex*> allVertices, vector<pair<vector<Point>, float>> points)`
 
-- vector<Vertex*> allVertices - lista wszystkich wierzchołków (pól, browarów, zajazdów, skrzyżowań
+- `vector<Vertex*> allVertices` - lista wszystkich wierzchołków (pól, browarów, zajazdów, skrzyżowań)
   
-- vector<pair<vector<Point>, float>> points - lista par (wielokąt, produkcja), gdzie każda para definiuje jedną ćwiartkę
+- `vector<pair<vector<Point>, float>> points` - lista par (wielokąt, produkcja), gdzie każda para definiuje jedną ćwiartkę
   
 ⦁ Opis funkcji:
   
-Tworzy ćwiartki na podstawie przekazanych punktów i przypisuje wartości produkcji polom (Field), które znajdują się wewnątrz danej ćwiartki. Używa dynamic_cast do identyfikacji obiektów typu Field.
+Tworzy ćwiartki na podstawie przekazanych punktów i przypisuje wartości produkcji polom (Field), które znajdują się wewnątrz danej ćwiartki. Używa `dynamic_cast` do identyfikacji obiektów typu Field.
 
 ⦁ Zwraca:
   
 Wypisuje informacje na temat przypisania danego pola do ćwiartki.
 
-⦁ int getQuadrantOfField(Field* f) 
-- Field* f – wskaźnik do obiektu Field.
+⦁ `int getQuadrantOfField(Field* f)` 
+
+- `Field* f` – wskaźnik do obiektu Field.
 
 ⦁ Opis funkcji:
   
-Sprawdza kolejno, do której ćwiartki należy pole f, używając metody isInside().
+Sprawdza kolejno, do której ćwiartki należy pole f, używając metody `isInside()`.
 
 ⦁ Zwraca:
   
@@ -109,23 +172,23 @@ Indeks pierwszej pasującej ćwiartki lub -1.
 
 Uwagi:
 
-⦁ Obiekty klasy Quadrant są tworzone dynamicznie (new) w konstruktorze MapQuadrants, ale nie są usuwane – potencjalny wyciek pamięci.
+⦁ Obiekty klasy `Quadrant` są tworzone dynamicznie (new) w konstruktorze `MapQuadrants`, ale nie są usuwane – potencjalny wyciek pamięci.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
 ⦁	**Algorytm Wyszukiwania w tekscie KMP (Knutha-Morrisa-Pratta)** - efektywny algorytm wyszukiwania wzorca w tekście, który działa w czasie liniowym względem długości tekstu i wzorca. Jego główną zaletą jest to, że unika ponownego porównywania znaków, które już zostały dopasowane.
 
-Klasa KMPSolver implementuje algorytm Knutha-Morrisa-Pratta (KMP) służący do wyszukiwania wzorca w wieloliniowym tekście. Obsługuje teksty zawierające polskie znaki dzięki konwersji UTF-8 na wstring
+Klasa `KMPSolver` implementuje algorytm Knutha-Morrisa-Pratta (KMP) służący do wyszukiwania wzorca w wieloliniowym tekście. Obsługuje teksty zawierające polskie znaki dzięki konwersji `UTF-8` na `wstring`
 
 ```KMPSolver(const string& tekst_utf8, const string& patern_utf8);```
 
-Tworzy instancję klasy KMPSolver, konwertując wejściowe łańcuchy znaków z UTF-8 (string) na wstring.
+Tworzy instancję klasy `KMPSolver`, konwertując wejściowe łańcuchy znaków z `UTF-8` (`string`) na `wstring`.
 
 Metody publiczne: 
-Wyszukuje wszystkie wystąpienia wzorca w każdej linii tekstu. Dla każdego dopasowania tworzy strukturę KMPAns z informacjami o lokalizacji.
+Wyszukuje wszystkie wystąpienia wzorca w każdej linii tekstu. Dla każdego dopasowania tworzy strukturę `KMPAns` z informacjami o lokalizacji.
 
 Zwraca: 
-Wektor struktur KMPAns, zawierających dane o wszystkich dopasowaniach wzorca.
+Wektor struktur `KMPAns`, zawierających dane o wszystkich dopasowaniach wzorca.
 
 Metody prywatne: 
 
@@ -136,7 +199,7 @@ Tworzy tablicę prefiksową dla danego wzorca, wykorzystywaną w algorytmie KMP
 do optymalizacji przeskoków.
 
 Zwraca: 
-Wektor prefix, gdzie prefix[i] to długość najdłuższego prefiksu będącego jednocześnie sufiksem podciągu pattern[0..i].
+Wektor `prefix`, gdzie `prefix[i]` to długość najdłuższego prefiksu będącego jednocześnie sufiksem podciągu `pattern[0..i]`.
 
 ```vector<int> kmpSearch(const wstring& line, const wstring& pattern);```
 
@@ -148,9 +211,9 @@ Wektor indeksów pozycji początkowych dopasowań wzorca w danej linii.
 
 UWAGI:
 
-⦁	Klasa przystosowana jest do tekstów z polskimi literami (UTF-8).
+⦁	Klasa przystosowana jest do tekstów z polskimi literami (`UTF-8`).
 
-⦁	Indeksy kolumn (column w KMPAns) podawane są w liczbie znaków (nie bajtów).
+⦁	Indeksy kolumn (column w `KMPAns`) podawane są w liczbie znaków (nie bajtów).
 
 ⦁	Działa na każdej linii osobno – nie wykrywa dopasowań "przez granice wierszy"
 
@@ -228,13 +291,11 @@ END
 
 ## wnioski
 
--Projekt prezentuje solidne zrozumienie algorytmów grafowych oraz ich implementacji w praktycznych problemach.
+-Projekt prezentuje zrozumienie algorytmów grafowych oraz ich implementacji w praktycznych problemach.
 
 -Dobrze zaprojektowana struktura kodu i dokumentacji ułatwia rozwój oraz testowanie.
 
--Implementacja algorytmu KMP z obsługą UTF-8 to miły dodatek, świadczący o dbałości o szczegóły.
-
--Docker zapewnia powtarzalność środowiska, co jest dużym plusem w projektach edukacyjnych i zespołowych.
+-Docker zapewnia powtarzalność środowiska, co jest dużym ułatwieniem podczas pracy zespołowej.
 
 ## podsumowanie
 
