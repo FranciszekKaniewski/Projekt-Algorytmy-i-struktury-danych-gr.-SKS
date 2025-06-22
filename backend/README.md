@@ -23,7 +23,8 @@
 **Zakres problemu:** Reprezentacja infrastruktury kraju (pola, browary, karczmy, drogi), przetwarzanie informacji przestrzennych, obliczanie przepustowości i kosztów napraw.
 
 ## zastosowane algorytmy
-
+- ### **Max Flow Solver Konstruktor**.
+  
 ⦁ class MaxFlowSolver:
 
 Klasa MaxFlowSolver pełni rolę kontenera danych grafu przepływowego – przechowuje wszystkie wierzchołki, krawędzie, przepustowości i aktualne przepływy. Dzięki temu możliwa jest realizacja różnych wariantów algorytmów przepływu (np. z lub bez kosztów) bez duplikowania kodu.
