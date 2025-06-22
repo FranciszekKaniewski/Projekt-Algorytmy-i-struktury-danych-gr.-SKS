@@ -1,0 +1,13 @@
+F 100 100 10
+C 200 100 5
+B 300 100
+
+E 0 1 2
+E 1 2 2
+
+Barley: 5
+Beer: 0
+BarleyPath 0 1 5
+BarleyPath 1 2 5
+
+END

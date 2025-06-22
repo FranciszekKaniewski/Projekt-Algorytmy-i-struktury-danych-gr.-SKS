@@ -31,7 +31,7 @@ void MaxFlowTestGroup::LoadData(std::string fileName) {
         else if(words[0] == "C") vertices.push_back(new Cross(stod(words[1]), stod(words[2]), stod(words[3])));
         else if(words[0] == "B") vertices.push_back(new Brewery(stod(words[1]), stod(words[2])));
         else if(words[0] == "I") vertices.push_back(new Inn(stod(words[1]), stod(words[2])));
-        else if(words[0] == "E") edges.push_back(new Edge(vertices[stoi(words[1])], vertices[stoi(words[2])]));
+        else if(words[0] == "E") edges.push_back(new Edge(vertices[stoi(words[1])], vertices[stoi(words[2])], stod(words[3])));
         else if(words[0] == "Barley:"){
             ans.barleyMaxFlow =  stof(words[1]);
         }
@@ -48,8 +48,11 @@ void MaxFlowTestGroup::LoadData(std::string fileName) {
 
             MaxFlowSolver* maxFlowSolver = new MaxFlowSolver(vertices,edges);
 
-            MaxFlowTest* mft = new MaxFlowTest(maxFlowSolver, ans,"MaxFlowTest",vertices);
-            addSingleTest(mft);
+            Test* test = !costs
+                        ? static_cast<Test*>(new MaxFlowTest(maxFlowSolver, ans, "MaxFlowTest", vertices))
+                        : static_cast<Test*>(new MaxFlowCostsTest(maxFlowSolver, ans, "MaxFlowWithCostsTest", vertices));
+
+            addSingleTest(test);
 
             for (auto e : edges) delete e;
 

@@ -1,17 +1,18 @@
-#include "./headers/MaxFlowTest.hpp"
+#include "./headers/MaxFlowCostsTest.hpp"
 
-MaxFlowTest::MaxFlowTest(MaxFlowSolver* maxFlowSolver, MaxFlowTest_Answer answer, string name, vector<Vertex*> vertices) : maxFlowSolver(maxFlowSolver), answer(answer), vertices(vertices), Test(name) {};
+MaxFlowCostsTest::MaxFlowCostsTest(MaxFlowSolver* maxFlowSolver, MaxFlowTest_Answer answer, string name, vector<Vertex*> vertices) : maxFlowSolver(maxFlowSolver), answer(answer), vertices(vertices), Test(name) {};
 
-MaxFlowTest::~MaxFlowTest(){
+MaxFlowCostsTest::~MaxFlowCostsTest(){
     for(auto v : vertices){
         delete v;
     }
 }
 
-void MaxFlowTest::Run() {
+void MaxFlowCostsTest::Run() {
     vector<tuple<int,int,float>> used_edges;
 
-    float barleyMaxFlow = maxFlowSolver->maxFlow(used_edges,vertices);;
+    float barleyMaxFlow = 0;
+    float barleyMinCost = maxFlowSolver->minCostMaxFlow(used_edges,vertices,barleyMaxFlow);
     if(answer.barleyMaxFlow != -1) {
         cout << "MaxFlowBarley: "<< barleyMaxFlow << " expects: " << answer.barleyMaxFlow;
 
@@ -41,8 +42,9 @@ void MaxFlowTest::Run() {
         }
     }
 
+    float beerMaxFlow = 0;
     maxFlowSolver->isBeerCreated = true;
-    float beerMaxFlow = maxFlowSolver->maxFlow(used_edges,vertices);
+    float beerMinCost = maxFlowSolver->minCostMaxFlow(used_edges,vertices,beerMaxFlow);
 
     used_edges.clear();
     if(answer.beerMaxFlow != -1) {
@@ -73,4 +75,7 @@ void MaxFlowTest::Run() {
             i++;
         }
     }
+
+    cout << "barleyMinCost: " << barleyMinCost << "\n"
+    << "beerMinCost: " << beerMinCost << '\n';
 }

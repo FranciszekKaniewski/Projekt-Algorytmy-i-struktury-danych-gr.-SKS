@@ -6,11 +6,21 @@
 #include "../../src/headers/vertex.hpp"
 #include "../../src/headers/Edge.hpp"
 #include "./test.hpp"
+
+struct MaxFlowTest_Answer{
+    float barleyMaxFlow;
+    float beerMaxFlow;
+    vector<tuple<int,int,float>> beerPaths;
+    vector<tuple<int,int,float>> barleyPaths;
+};
+
 #include "./MaxFlowTest.hpp"
+#include "./MaxFlowCostsTest.hpp"
 
 class MaxFlowTestGroup : public TestGroup {
 public:
-    MaxFlowTestGroup(string name) : TestGroup(name) {};
+    bool costs;
+    MaxFlowTestGroup(string name, bool costs=false) : TestGroup(name), costs(costs) {};
     ~MaxFlowTestGroup()  = default;
 
     void LoadData(string fileName) override;

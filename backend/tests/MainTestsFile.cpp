@@ -21,5 +21,10 @@ int main(){
     maxFlowTestGroup.LoadData("max-flow-test.txt");
     maxFlowTestGroup.RunAllTests();
 
+    //Testing max flow with costs in web
+    MaxFlowTestGroup maxFlowWithCostsTestGroup = MaxFlowTestGroup("MaxFlowWithCostsTests",true);
+    maxFlowWithCostsTestGroup.LoadData("max-flow-with-costs-test.txt");
+    maxFlowWithCostsTestGroup.RunAllTests();
+
     return 0;
 }
