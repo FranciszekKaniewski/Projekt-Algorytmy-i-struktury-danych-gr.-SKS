@@ -24,6 +24,29 @@
 
 ## zastosowane algorytmy
 
+⦁ class MaxFlowSolver:
+
+Klasa MaxFlowSolver pełni rolę kontenera danych grafu przepływowego – przechowuje wszystkie wierzchołki, krawędzie, przepustowości i aktualne przepływy. Dzięki temu możliwa jest realizacja różnych wariantów algorytmów przepływu (np. z lub bez kosztów) bez duplikowania kodu.
+
+⦁ Elementy współdzielone przez oba algorytmy:
+Struktura grafu:
+
+-vector<vector<float>> capacity – macierz przepustowości
+
+-vector<vector<float>> flowPassed – aktualny przepływ
+
+-vector<vector<int>> adj – lista sąsiedztwa
+
+⦁ Reprezentacja wierzchołków:
+
+-Wierzchołki dziedziczą po Vertex (np. Field, Brewery)
+
+⦁ Podstawowe mechanizmy przepływu:
+
+-Rejestracja i aktualizacja przepływów
+
+-Budowa ścieżki na podstawie parent wektora
+
 - ### **Max Flow** – zdefiniowane węzły i połączenia sieciowe.
 
 `MaxFlowSolver` to klasa odpowiedzialna za obliczenie maksymalnego przepływu w sieci przepływu z ograniczonymi przepustowościami. Struktura systemu obejmuje specjalne wierzchołki pomocnicze dla etapów produkcji jęczmienia i dystrybucji piwa.
@@ -89,6 +112,116 @@ Oblicza maksymalny możliwy przepływ od źródła do ujścia.
 
 ----------------------------------------------------------------------------------------------------------------------------------
 - ### **Min Cost Max Flow** – uwzględnienie kosztów transportu i przepustowości.
+Opis:
+
+Kod realizuje algorytm minimalnego kosztu maksymalnego przepływu (Min-Cost Max-Flow) z użyciem modyfikacji algorytmu Bellmana-Forda, znanej jako SPFA (Shortest Path Faster Algorithm).
+
+Algorytm ten jest wykorzystywany do:
+
+optymalizacji transportu zasobów (np. jęczmień, piwo) między wierzchołkami (takimi jak pola i browary),
+
+minimalizacji całkowitego kosztu transportu przy jednoczesnym maksymalizowaniu przepływu.
+
+W grafie każdy wierzchołek może reprezentować różne jednostki logiczne (Field, Brewery, Inn, Cross), a krawędzie reprezentują drogi o określonej przepustowości i koszcie transportu.
+
+Użyte Metody klasy:
+
+⦁ bool spfa(int s, int t, std::vector<int>& parent, std::vector<float>& min_cost_path);
+
+Opis:
+
+-Zaimplementowana wersja algorytmu SPFA (Shortest Path Faster Algorithm) do wyszukiwania najtańszej ścieżki w grafie z wagami (kosztami).
+
+-Algorytm działa na podstawie zmodyfikowanego algorytmu Bellmana-Forda z użyciem kolejki FIFO (deque), co pozwala na bardziej efektywne znajdowanie najkrótszych ścieżek niż klasyczna wersja.
+
+Parametry:
+
+-s – Numer wierzchołka źródłowego (startowego).
+
+-t – Numer wierzchołka docelowego (ujścia).
+
+-parent – Wektor, w którym zostanie zapisana informacja o poprzedniku każdego wierzchołka w znalezionej ścieżce. Umożliwia późniejsze odtworzenie drogi.
+
+-min_cost_path – Wektor kosztów dotarcia z s do każdego wierzchołka. Używany do wyboru minimalnego kosztu podczas aktualizacji.
+
+Zwraca:
+
+-true, jeśli istnieje ścieżka o dodatniej przepustowości i minimalnym koszcie między s a t,
+
+-false, jeśli taka ścieżka nie istnieje.
+
+⦁ float minCostMaxFlow(std::vector<std::tuple<int, int, float>>& used_edges, std::vector<Vertex*> vertices, float& totalFlow)
+
+Opis:
+
+-Realizuje algorytm Minimalnego Kosztu Maksymalnego Przepływu (Min-Cost Max-Flow) oparty na iteracyjnym wywoływaniu algorytmu SPFA.
+
+-W każdej iteracji szukana jest najtańsza ścieżka przepływu z aktualnego źródła do ujścia, następnie aktualizowany jest przepływ i koszt.'
+
+Parametry:
+
+-used_edges – Wektor krotek (u, v, flow) – zawiera wszystkie krawędzie wykorzystane w przepływie oraz wielkość przepływu przez nie.
+
+-vertices – Wektor wskaźników do obiektów Vertex. Służy do aktualizacji stanu browarów po zakończonym przepływie jęczmienia.
+
+-totalFlow – Zmienna przekazywana przez referencję, do której zostanie przypisany całkowity przepływ.
+
+Zwraca:
+
+-float – Całkowity koszt przepływu, obliczany na podstawie wykorzystanych krawędzi.
+
+⦁ Szczegóły działania:
+
+-Zainicjalizuj flowPassed i edgeUsedForCost.
+
+⦁ W pętli wykonuj:
+
+-Szukanie najtańszej ścieżki (spfa).
+
+-Znalezienie maksymalnego możliwego przepływu na tej ścieżce (path_flow).
+
+-Aktualizacja macierzy przepływu: dodanie path_flow do flowPassed[u][v], odjęcie od flowPassed[v][u].
+
+-Zliczanie kosztów tylko za pierwsze użycie krawędzi.
+
+-Zapisz (u, v, path_flow) do used_edges.
+
+-Aktualizacja stanu magazynu (stored) browarów po zakończeniu etapu 1.
+
+-Kończ działanie, gdy nie ma już ścieżek z dodatnią przepustowością.
+
+⦁ Użyte struktury danych do wykorzystania algorytmu:
+
+-std::vector<std::vector<float>> capacity
+
+Opis:
+
+Macierz o wymiarach n x n (gdzie n to liczba wierzchołków) przechowująca maksymalną przepustowość między każdą parą wierzchołków u, v. Wartość capacity[u][v] to maksymalna ilość jednostek (np. jęczmień lub piwo), jaka może przepłynąć z u do v.
+
+-std::vector<std::vector<float>> flowPassed
+
+Opis:
+
+Macierz przechowująca aktualny przepływ na każdej krawędzi. Wartość flowPassed[u][v] to ilość jednostek przesłana z u do v. Może być również ujemna, jeśli przepływ jest cofany.
+
+-std::vector<std::vector<float>> cost
+
+Opis:
+
+Macierz kosztów jednostkowych. Wartość cost[u][v] oznacza koszt przesłania jednej jednostki przepływu z u do v.
+
+-std::vector<std::vector<bool>> edgeUsedForCost
+
+Opis:
+
+Macierz znaczników (n x n). Wartość true oznacza, że krawędź (u,v) została już wykorzystana w kosztorysie i nie powinna być uwzględniana ponownie. Chroni to przed podwójnym sumowaniem kosztów, jeśli przepływ przez tę samą krawędź zachodzi wielokrotnie.
+
+-std::vector<std::vector<int>> adj
+
+Opis:
+
+Listy sąsiedztwa. adj[u] zawiera listę sąsiadów wierzchołka u, do których istnieje krawędź bezpośrednia (capacity[u][v] > 0).
+
 -----------------------------------------------------------------------------------------------------------------------------------
 - ### **MapQuadrants** - Ćwiartki mapy
 
