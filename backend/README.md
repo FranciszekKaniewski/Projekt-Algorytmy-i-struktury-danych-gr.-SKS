@@ -30,6 +30,68 @@ Reprezentacja:
 
 ⦁	Min Cost Max Flow
 
+⦁ MapQuadrants - Ćwiartki mapy
+Opis:
+Kod służy do przypisywania wartości produkcji polom na podstawie ich położenia względem zdefiniowanych obszarów (ćwiartek). Każda ćwiartka to wielokąt określony przez punkty (Point), któremu przypisana jest konkretna wartość produkcji.
+
+Klasa MapQuadrants zarządza wszystkimi ćwiartkami oraz analizuje, do której z nich należy każde pole. Jeśli pole znajduje się wewnątrz jakiegoś obszaru, jego produkcja zostaje ustawiona zgodnie z przypisaną wartością ćwiartki.
+
+Do sprawdzania, czy punkt leży wewnątrz wielokąta, używany jest algorytm oparty na znaku iloczynów wektorowych – działa poprawnie także wtedy, gdy punkt leży dokładnie na krawędzi.
+
+Użyte Struktury:
+struct Point - reprezentuje dwuwymiarowy punkt.
+⦁ float x - Współrzędna X punktu
+⦁ float y - Współrzędna Y punktu
+
+Użyte Klasy:
+class Quadrant - Reprezentuje jeden z obszarów (wielokątów), które mogą przypisywać produkcję do pól (Field).
+⦁ vector<Point> points - Wierzchołki wielokąta definiujące granice ćwiartki.
+⦁ float assignedProduction - Wartość produkcji przypisana polom znajdującym się w tym obszarze (domyślnie ustawiana na -1).
+
+Metody Klasy Quadrant:
+⦁ Quadrant(const vector<Point>& numbers, float production) - Konstruktor przypisujący punkty i wartość produkcji.
+- const vector<Point>& numbers - lista wszystkich wierzchołków
+- float production - określona wartośc produkcji dla danej ćwiartki.
+⦁ bool isInside(Field* f)
+- Field* f – wskaźnik do obiektu Field.
+- Opis funkcji:
+  
+-Jej działanie opiera się na własnościach iloczynu wektorowego, zadanego wzorem - (b.x - a.x) * (py - a.y) - (b.y - a.y) * (px - a.x);
+-Po obliczeniu iloczynu wektorowego, sprawdzamy jego wartość. Gdy jest ona większa od 0, oznacza to, że leży on po lewej stronie krawędzi AB, natomiast jeżeli jest mniejsza od 0 to po prawej stronie. Gdy wartość jest równa 0, to punkt P leży na tej krawędzi.
+
+Zwraca:
+
+-Dla każdego punktu zwraca odpowiednią wartość true lub false, zależną od przynależności do wielokąta.
+  
+class MapQuadrants - Zarządza zestawem obszarów (ćwiartek), przypisuje wartości produkcji polom (Field) na podstawie ich położenia.
+⦁ vector<Quadrant*> quadrants - Lista zdefiniowanych ćwiartek
+⦁ MapQuadrants(){} - Domyślny konstruktor.
+⦁ MapQuadrants(vector<Vertex*> allVertices, vector<pair<vector<Point>, float>> points)
+- vector<Vertex*> allVertices - lista wszystkich wierzchołków (pól, browarów, zajazdów, skrzyżowań
+- vector<pair<vector<Point>, float>> points - lista par (wielokąt, produkcja), gdzie każda para definiuje jedną ćwiartkę
+- Opis funkcji:
+  
+Tworzy ćwiartki na podstawie przekazanych punktów i przypisuje wartości produkcji polom (Field), które znajdują się wewnątrz danej ćwiartki. Używa dynamic_cast do identyfikacji obiektów typu Field.
+
+- Zwraca:
+  
+Wypisuje informacje na temat przypisania danego pola do ćwiartki.
+
+⦁ int getQuadrantOfField(Field* f) 
+- Field* f – wskaźnik do obiektu Field.
+
+- Opis funkcji:
+  
+Sprawdza kolejno, do której ćwiartki należy pole f, używając metody isInside().
+
+- Zwraca:
+  
+Indeks pierwszej pasującej ćwiartki lub -1.
+
+Uwagi:
+
+⦁ Obiekty klasy Quadrant są tworzone dynamicznie (new) w konstruktorze MapQuadrants, ale nie są usuwane – potencjalny wyciek pamięci.
+  
 ⦁	Algorytm Wyszukiwania w tekscie(KMP)
 Klasa KMPSolver implementuje algorytm Knutha-Morrisa-Pratta (KMP) służący do wyszukiwania wzorca w wieloliniowym tekście. Obsługuje teksty zawierające polskie znaki dzięki konwersji UTF-8 na wstring
 
