@@ -8,6 +8,7 @@
 6. s
 7. s
 8. s
+9. [How to run](#how-to-run)
 
 ## opis projektu
 Członkowie grupy: Franciszek Kaniewski, Jerema Szyński, Kacper Smolarczyk
@@ -81,3 +82,25 @@ UWAGI:
 ## Wnioski
 
 ## Podsumowanie
+
+## 🛠 Jak Uruchomić
+1. Klonowanie repozytorium:
+    ```bash
+    git clone https://github.com/FranciszekKaniewski/Projekt-Algorytmy-i-struktury-danych-gr.-SKS.git
+    ```
+2. Przejście do katalogu projektu:
+    ```bash
+    cd ./Projekt-Algorytmy-i-struktury-danych-gr.-SKS
+    ```
+3. Budowa aplikacji:
+    ```bash
+    docker-compose --profile build up --build
+    ```
+4. Uruchamianie aplikacji:
+    ```bash
+    docker-compose --profile run up
+    ```
+5. Uruchamianie testów:
+    ```bash
+    docker-compose up tests-run
+    ```
