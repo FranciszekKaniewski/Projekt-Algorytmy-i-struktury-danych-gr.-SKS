@@ -27,9 +27,8 @@
   
 ⦁ class MaxFlowSolver:
 
-Klasa MaxFlowSolver pełni rolę kontenera danych grafu przepływowego – przechowuje wszystkie wierzchołki, krawędzie, przepustowości i aktualne przepływy. Dzięki temu możliwa jest realizacja różnych wariantów algorytmów przepływu (np. z lub bez kosztów) bez duplikowania kodu.
-
 ⦁ Elementy współdzielone przez oba algorytmy:
+
 Struktura grafu:
 
 -vector<vector<float>> capacity – macierz przepustowości
@@ -47,6 +46,8 @@ Struktura grafu:
 -Rejestracja i aktualizacja przepływów
 
 -Budowa ścieżki na podstawie parent wektora
+
+----------------------------------------------------------------------------------------------------------------------------------
 
 - ### **Max Flow** – zdefiniowane węzły i połączenia sieciowe.
 
