@@ -128,7 +128,7 @@ W grafie każdy wierzchołek może reprezentować różne jednostki logiczne (Fi
 
 Użyte Metody klasy:
 
-⦁ bool spfa(int s, int t, std::vector<int>& parent, std::vector<float>& min_cost_path);
+```bool spfa(int s, int t, std::vector<int>& parent, std::vector<float>& min_cost_path);```
 
 Opis:
 
@@ -138,21 +138,21 @@ Opis:
 
 Parametry:
 
--s – Numer wierzchołka źródłowego (startowego).
+-`s` – Numer wierzchołka źródłowego (startowego).
 
--t – Numer wierzchołka docelowego (ujścia).
+-`t` – Numer wierzchołka docelowego (ujścia).
 
--parent – Wektor, w którym zostanie zapisana informacja o poprzedniku każdego wierzchołka w znalezionej ścieżce. Umożliwia późniejsze odtworzenie drogi.
+-`parent` – Wektor, w którym zostanie zapisana informacja o poprzedniku każdego wierzchołka w znalezionej ścieżce. Umożliwia późniejsze odtworzenie drogi.
 
--min_cost_path – Wektor kosztów dotarcia z s do każdego wierzchołka. Używany do wyboru minimalnego kosztu podczas aktualizacji.
+-`min_cost_path` – Wektor kosztów dotarcia z s do każdego wierzchołka. Używany do wyboru minimalnego kosztu podczas aktualizacji.
 
 Zwraca:
 
--true, jeśli istnieje ścieżka o dodatniej przepustowości i minimalnym koszcie między s a t,
+-`true`, jeśli istnieje ścieżka o dodatniej przepustowości i minimalnym koszcie między s a t,
 
--false, jeśli taka ścieżka nie istnieje.
+-`false`, jeśli taka ścieżka nie istnieje.
 
-⦁ float minCostMaxFlow(std::vector<std::tuple<int, int, float>>& used_edges, std::vector<Vertex*> vertices, float& totalFlow)
+```float minCostMaxFlow(std::vector<std::tuple<int, int, float>>& used_edges, std::vector<Vertex*> vertices, float& totalFlow)```
 
 Opis:
 
@@ -162,15 +162,15 @@ Opis:
 
 Parametry:
 
--used_edges – Wektor krotek (u, v, flow) – zawiera wszystkie krawędzie wykorzystane w przepływie oraz wielkość przepływu przez nie.
+-`used_edges` – Wektor krotek (u, v, flow) – zawiera wszystkie krawędzie wykorzystane w przepływie oraz wielkość przepływu przez nie.
 
--vertices – Wektor wskaźników do obiektów Vertex. Służy do aktualizacji stanu browarów po zakończonym przepływie jęczmienia.
+-`vertices` – Wektor wskaźników do obiektów Vertex. Służy do aktualizacji stanu browarów po zakończonym przepływie jęczmienia.
 
--totalFlow – Zmienna przekazywana przez referencję, do której zostanie przypisany całkowity przepływ.
+-`totalFlow` – Zmienna przekazywana przez referencję, do której zostanie przypisany całkowity przepływ.
 
 Zwraca:
 
--float – Całkowity koszt przepływu, obliczany na podstawie wykorzystanych krawędzi.
+-`float` – Całkowity koszt przepływu, obliczany na podstawie wykorzystanych krawędzi.
 
 ⦁ Szczegóły działania:
 
